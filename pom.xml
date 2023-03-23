@@ -7,7 +7,24 @@
     <groupId>cn.nkk.hikvision</groupId>
     <artifactId>hikvision-spring-boot-starter</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <name>hikvision-spring-boot-starter</name>
+    <description>海康威视sdk包</description>
+    <url>https://github.com/waimifeier/hikvision-spring-boot-starter</url>
 
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <id>waimifeier</id>
+            <name>nkk</name>
+            <email>waimifeier@qq.com</email>
+        </developer>
+    </developers>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
@@ -41,6 +58,7 @@
             <groupId>com.sun.jna</groupId>
             <artifactId>jna</artifactId>
             <version>3.0.9</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -56,46 +74,24 @@
             <groupId>org.bytedeco</groupId>
             <artifactId>javacv-platform</artifactId>
             <version>1.5.1</version>
+            <scope>compile</scope>
         </dependency>
-
     </dependencies>
 
-    <!--<build>
-        <resources>
-            <resource>
-                <directory>lib</directory>
-                <targetPath>BOOT-INF/lib/</targetPath>
-                <includes>
-                    <include>**/*.jar</include>
-                </includes>
-            </resource>
-        </resources>
+   <build>
        <plugins>
            <plugin>
-               <artifactId>maven-compiler-plugin</artifactId>
-               <configuration>
-                   <compilerArguments>
-                       <extdirs>BOOT-INF/lib</extdirs>
-                   </compilerArguments>
-               </configuration>
-           </plugin>
-           <plugin>
                <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-surefire-plugin</artifactId>
+               <artifactId>maven-compiler-plugin</artifactId>
+               <version>3.8.0</version>
                <configuration>
-                   <skip>true</skip>
-               </configuration>
-           </plugin>
-           <plugin>
-               <groupId>org.springframework.boot</groupId>
-               <artifactId>spring-boot-maven-plugin</artifactId>
-               <configuration>
-                   <includeSystemScope>true</includeSystemScope>
+                   <source>1.8</source>
+                   <target>1.8</target>
                </configuration>
            </plugin>
        </plugins>
-    </build>
--->
+   </build>
+
 
 
 
