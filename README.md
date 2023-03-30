@@ -52,25 +52,19 @@ hik:
 ## 案例
 ### rtsp推流
 ```java
-@GetMapping(value = "/video/live.flv",produces = {"video/x-flv;charset=UTF-8"})
-public void flvStream(HttpServletResponse response,HttpServletRequest request){
+@GetMapping(value = "/video/live2.flv",produces = {"video/x-flv;charset=UTF-8"})
+public void flvRtsp(HttpServletResponse response,HttpServletRequest request){
 
     AsyncContext asyncContext = request.startAsync();
     asyncContext.setTimeout(0);
 
-    // 获取rtsp地址，rtsp回放有延迟
     String rtspUrl = HkUtils.toRtspUrl("ip", "推流端口", "账号", "密码","通道号");
     try {
         HkUtils.rtspToFlv(rtspUrl,asyncContext);
     }catch (Exception e){
         e.printStackTrace();
-    } finally {
-        try {
-            asyncContext.complete();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
     }
+}
 ```
 
 ### sdk推流

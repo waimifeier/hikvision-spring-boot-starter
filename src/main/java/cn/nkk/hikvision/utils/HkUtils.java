@@ -395,7 +395,8 @@ public final class HkUtils {
 
         try {
             PipedOutputStream outputStream = new PipedOutputStream();
-            RealDataCallBack realDataCallBack = new RealDataCallBack(outputStream);
+            RealDataCallBack realDataCallBack = SpringUtils.getBean(RealDataCallBack.class);
+            realDataCallBack.setOutputStream(outputStream);
             int playHandle = hcNetSDK.NET_DVR_RealPlay_V40(userId, strClientInfo, realDataCallBack , null);
             if(playHandle==-1){
                 int iErr = hcNetSDK.NET_DVR_GetLastError();
@@ -455,7 +456,8 @@ public final class HkUtils {
         }
 
         PipedOutputStream outputStream = new PipedOutputStream();
-        BackDataCallBack backDataCallBack = new BackDataCallBack(outputStream);
+        BackDataCallBack backDataCallBack = SpringUtils.getBean(BackDataCallBack.class);
+        backDataCallBack.setOutputStream(outputStream);
         // 注册回调函数
         hcNetSDK.NET_DVR_SetPlayDataCallBack(playHandle, backDataCallBack,0);
         // 控制录像回放状态  开始回放
