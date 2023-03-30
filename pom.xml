@@ -2,8 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-parent</artifactId>
+        <version>2.7.3</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>cn.nkk.hikvision</groupId>
     <artifactId>hikvision-spring-boot-starter</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -11,13 +15,13 @@
     <description>海康威视sdk包</description>
     <url>https://github.com/waimifeier/hikvision-spring-boot-starter</url>
 
-
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
+
     <developers>
         <developer>
             <id>waimifeier</id>
@@ -25,31 +29,46 @@
             <email>waimifeier@qq.com</email>
         </developer>
     </developers>
+
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <hutool.version>5.7.11</hutool.version>
+        <javacv-platform.version>1.5.1</javacv-platform.version>
+        <jna.version>3.0.9</jna.version>
     </properties>
 
-    <dependencies>
+    <repositories>
 
+        <repository>
+            <id>aliyun</id>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </repository>
+
+        <repository>
+            <id>mvn-repo</id>
+            <url>https://raw.github.com/waimifeier/mvn-repo/master</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
-            <version>2.7.3</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
-            <version>2.7.3</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
-            <version>2.5.9</version>
             <optional>true</optional>
         </dependency>
 
@@ -57,26 +76,45 @@
         <dependency>
             <groupId>com.sun.jna</groupId>
             <artifactId>jna</artifactId>
-            <version>3.0.9</version>
+            <version>${jna.version}</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
-            <groupId>com.sun.jna.examples</groupId>
-            <artifactId>examples</artifactId>
-            <version>1.0.0</version>
+            <groupId>com.sun.jna</groupId>
+            <artifactId>jna-examples</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
 
         <!--抓流-->
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>javacv-platform</artifactId>
-            <version>1.5.1</version>
+            <version>${javacv-platform.version}</version>
             <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-core</artifactId>
+            <version>${hutool.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
    <build>
+       <resources>
+          <resource>
+              <directory>src/main/resources</directory>
+          </resource>
+        </resources>
        <plugins>
            <plugin>
                <groupId>org.apache.maven.plugins</groupId>
@@ -88,9 +126,6 @@
                </configuration>
            </plugin>
        </plugins>
+
    </build>
-
-
-
-
 </project>
