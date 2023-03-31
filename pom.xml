@@ -47,7 +47,7 @@
 
         <repository>
             <id>mvn-repo</id>
-            <url>https://raw.github.com/waimifeier/mvn-repo/master</url>
+            <url>https://raw.githubusercontent.com/waimifeier/mvn-repo/master</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
