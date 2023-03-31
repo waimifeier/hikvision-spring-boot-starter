@@ -452,13 +452,11 @@ public final class HkUtils {
 
         if(playHandle<0){
             int v30ErrorCode = hcNetSDK.NET_DVR_GetLastError();
-            throw new RuntimeException("文件查询失败,code:"+v30ErrorCode);
         }
 
         PipedOutputStream outputStream = new PipedOutputStream();
         BackDataCallBack backDataCallBack = SpringUtils.getBean(BackDataCallBack.class);
         backDataCallBack.outputStreamMap.put(playHandle,outputStream);
-        log.info("句柄:{},输出管道:{}",playHandle,outputStream);
         // 注册回调函数
         hcNetSDK.NET_DVR_SetPlayDataCallBack(playHandle, backDataCallBack,0);
         // 控制录像回放状态  开始回放
@@ -472,7 +470,6 @@ public final class HkUtils {
         videoPreview.setType(0);
         videoPreview.setChannelNum(channelNum);
         videoPreview.setOutputStream(outputStream);
-        log.info("句柄22:{},输出管道22:{}",playHandle,outputStream);
         videoPreview.setBeginTime(beginTime);
         videoPreview.setEndTime(endTime);
         return videoPreview;
@@ -485,7 +482,7 @@ public final class HkUtils {
     public static void stopBackPlay(int playHandle){
         hcNetSDK.NET_DVR_PlayBackControl(playHandle, HCNetSDK.NET_DVR_PLAYSTOPAUDIO, 0, null);
         hcNetSDK.NET_DVR_StopPlayBack(playHandle);
-        log.info("停止回放预览------");
+        log.info("停止回放预览");
     }
 
 
