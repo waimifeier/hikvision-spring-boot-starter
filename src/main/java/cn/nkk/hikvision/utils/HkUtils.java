@@ -481,6 +481,7 @@ public final class HkUtils {
      * @param playHandle 播放id
      */
     public static void stopBackPlay(int playHandle){
+        log.info("停止回放预览");
         hcNetSDK.NET_DVR_StopPlayBack(playHandle);
     }
 
