@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.PipedOutputStream;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -21,14 +23,7 @@ public class BackDataCallBack implements HCNetSDK.FPlayDataCallBack{
 
     private final static Logger log = LoggerFactory.getLogger(BackDataCallBack.class);
 
-    private PipedOutputStream outputStream;
-
-    public BackDataCallBack(){
-    }
-
-    public void setOutputStream(PipedOutputStream outputStream) {
-        this.outputStream = outputStream;
-    }
+    public Map<Integer,PipedOutputStream> outputStreamMap=new HashMap<>();
 
     @Override
     public void invoke(int lPlayHandle, int dwDataType, ByteByReference pBuffer, int dwBufSize, int dwUser) {
@@ -38,7 +33,7 @@ public class BackDataCallBack implements HCNetSDK.FPlayDataCallBack{
             buffers.rewind();
             buffers.get(bytes);
             try {
-                outputStream.write(bytes);
+                outputStreamMap.get(lPlayHandle).write(bytes);
             } catch (IOException e) {
                 log.error("回放预览回调：{}",e.getMessage());
             }

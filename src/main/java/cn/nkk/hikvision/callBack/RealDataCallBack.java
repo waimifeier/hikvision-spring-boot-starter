@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.PipedOutputStream;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -20,16 +22,7 @@ import java.nio.ByteBuffer;
 public class RealDataCallBack implements HCNetSDK.FRealDataCallBack_V30 {
 
     private final static Logger log = LoggerFactory.getLogger(RealDataCallBack.class);
-
-    private PipedOutputStream outputStream;
-
-
-    public RealDataCallBack(){
-    }
-
-    public void setOutputStream(PipedOutputStream outputStream) {
-        this.outputStream = outputStream;
-    }
+    public Map<Integer,PipedOutputStream> outputStreamMap=new HashMap<>();
 
     @Override
     public void invoke(int lRealHandle, int dwDataType, ByteByReference pBuffer, int dwBufSize, Pointer pUser) {
@@ -39,7 +32,7 @@ public class RealDataCallBack implements HCNetSDK.FRealDataCallBack_V30 {
             buffers.rewind();
             buffers.get(bytes);
             try {
-                outputStream.write(bytes);
+                outputStreamMap.get(lRealHandle).write(bytes);
             } catch (IOException e) {
                 log.error("实时预览回调：{}",e.getMessage());
             }

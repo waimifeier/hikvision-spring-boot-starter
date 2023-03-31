@@ -396,13 +396,13 @@ public final class HkUtils {
         try {
             PipedOutputStream outputStream = new PipedOutputStream();
             RealDataCallBack realDataCallBack = SpringUtils.getBean(RealDataCallBack.class);
-            realDataCallBack.setOutputStream(outputStream);
             int playHandle = hcNetSDK.NET_DVR_RealPlay_V40(userId, strClientInfo, realDataCallBack , null);
             if(playHandle==-1){
                 int iErr = hcNetSDK.NET_DVR_GetLastError();
                 log.error("取流失败,错误码：{}" ,iErr);
                 throw new RuntimeException("取流失败");
             }
+            realDataCallBack.outputStreamMap.put(playHandle,outputStream);
             log.info("取流成功");
             VideoPreview videoPreview = new VideoPreview();
             videoPreview.setPlayHandler(playHandle);
@@ -457,7 +457,8 @@ public final class HkUtils {
 
         PipedOutputStream outputStream = new PipedOutputStream();
         BackDataCallBack backDataCallBack = SpringUtils.getBean(BackDataCallBack.class);
-        backDataCallBack.setOutputStream(outputStream);
+        backDataCallBack.outputStreamMap.put(playHandle,outputStream);
+        log.info("句柄:{},输出管道:{}",playHandle,outputStream);
         // 注册回调函数
         hcNetSDK.NET_DVR_SetPlayDataCallBack(playHandle, backDataCallBack,0);
         // 控制录像回放状态  开始回放
@@ -471,6 +472,7 @@ public final class HkUtils {
         videoPreview.setType(0);
         videoPreview.setChannelNum(channelNum);
         videoPreview.setOutputStream(outputStream);
+        log.info("句柄22:{},输出管道22:{}",playHandle,outputStream);
         videoPreview.setBeginTime(beginTime);
         videoPreview.setEndTime(endTime);
         return videoPreview;
@@ -481,8 +483,9 @@ public final class HkUtils {
      * @param playHandle 播放id
      */
     public static void stopBackPlay(int playHandle){
-        log.info("停止回放预览");
+        hcNetSDK.NET_DVR_PlayBackControl(playHandle, HCNetSDK.NET_DVR_PLAYSTOPAUDIO, 0, null);
         hcNetSDK.NET_DVR_StopPlayBack(playHandle);
+        log.info("停止回放预览------");
     }
 
 
