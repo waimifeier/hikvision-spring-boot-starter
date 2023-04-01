@@ -51,9 +51,13 @@ hik:
 ```
 ## 案例
 ### rtsp推流
+
+- rtsp 实时预览
+> 海康设备rtsp实时预览还是比较稳定
+
 ```java
-@GetMapping(value = "/video/live2.flv",produces = {"video/x-flv;charset=UTF-8"})
-public void flvRtsp(HttpServletResponse response,HttpServletRequest request){
+@GetMapping(value = "/video/rtspReal.flv",produces = {"video/x-flv;charset=UTF-8"})
+public void flvRtspReal(HttpServletResponse response,HttpServletRequest request){
 
     AsyncContext asyncContext = request.startAsync();
     asyncContext.setTimeout(0);
@@ -66,15 +70,33 @@ public void flvRtsp(HttpServletResponse response,HttpServletRequest request){
     }
 }
 ```
+- 回放预览
+> 目前接入的海康设备rtsp回放不太稳定，会经常播放不了(不知道不是设备问题)，即使能播放也有很大的延迟
+
+```java
+@GetMapping(value = "/video/rtspBack.flv",produces = {"video/x-flv;charset=UTF-8"})
+public void flvRtspBack(HttpServletResponse response,HttpServletRequest request){
+
+    AsyncContext asyncContext = request.startAsync();
+    asyncContext.setTimeout(0);
+    // 获取rtsp回放地址
+    String rtspUrl = HkUtils.toRtspUrl("ip", "推流端口", "账号", "密码","通道号","2023-03-10 12:00:00","2023-03-10 13:00:00");
+    try {
+        HkUtils.rtspToFlv(rtspUrl,asyncContext);
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+}
+```
 
 ### sdk推流
+- sdk 实时预览
 ```java
-
 /**
  * 实时预览
  */
-@GetMapping(value = "/video/live.flv",produces = {"video/x-flv;charset=UTF-8"})
-    public void flvStream(HttpServletResponse response,HttpServletRequest request){
+@GetMapping(value = "/video/sdkReal.flv",produces = {"video/x-flv;charset=UTF-8"})
+    public void flvSdkReal(HttpServletResponse response,HttpServletRequest request){
 
         AsyncContext asyncContext = request.startAsync();
         asyncContext.setTimeout(0);
@@ -112,14 +134,14 @@ public void flvRtsp(HttpServletResponse response,HttpServletRequest request){
     }
 ```
 
-
+- sdk回放预览
 ```java
 
 /**
  * 回放预览
  */
-@GetMapping(value = "/video/live.flv",produces = {"video/x-flv;charset=UTF-8"})
-    public void flvStream(HttpServletResponse response,HttpServletRequest request){
+@GetMapping(value = "/video/sdkBack.flv",produces = {"video/x-flv;charset=UTF-8"})
+    public void flvSdkBack(HttpServletResponse response,HttpServletRequest request){
 
         AsyncContext asyncContext = request.startAsync();
         asyncContext.setTimeout(0);
