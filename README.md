@@ -53,7 +53,6 @@ hik:
 ### rtsp推流
 
 #### 1.rtsp 实时预览
-> 海康设备rtsp实时预览还是比较稳定
 
 ```java
 @GetMapping(value = "/video/rtspReal.flv",produces = {"video/x-flv;charset=UTF-8"})
