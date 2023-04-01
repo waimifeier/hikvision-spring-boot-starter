@@ -40,7 +40,7 @@ public final class HkUtils {
 
     private final static Logger log = LoggerFactory.getLogger(HkUtils.class);
     private static final HCNetSDK hcNetSDK = SpringUtils.getBean(HCNetSDK.class);
-    private static final HiKProperties hiKProperties = SpringUtils.getBean(HiKProperties.class);
+
 
     /**
      * 加载linux系统类库
@@ -49,6 +49,7 @@ public final class HkUtils {
         if (OsSelectUtil.isLinux()) {
             HCNetSDK.BYTE_ARRAY ptrByteArray1 = new HCNetSDK.BYTE_ARRAY(256);
             HCNetSDK.BYTE_ARRAY ptrByteArray2 = new HCNetSDK.BYTE_ARRAY(256);
+            HiKProperties hiKProperties = SpringUtils.getBean(HiKProperties.class);
             String strPathCom = hiKProperties.getSdk_path();
 
             //这里是库的绝对路径，请根据实际情况修改，注意改路径必须有访问权限
