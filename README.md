@@ -70,7 +70,7 @@ public void flvRtspReal(HttpServletResponse response,HttpServletRequest request)
     }
 }
 ```
-#### 2.回放预览
+#### 2.rtsp回放预览
 > 目前接入的海康设备rtsp回放不太稳定，会经常播放不了(不知道是不是设备的问题)，即使能播放也有很大的延迟
 
 ```java
