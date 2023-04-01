@@ -71,7 +71,7 @@ public void flvRtspReal(HttpServletResponse response,HttpServletRequest request)
 }
 ```
 - 回放预览
-> 目前接入的海康设备rtsp回放不太稳定，会经常播放不了(不知道不是设备问题)，即使能播放也有很大的延迟
+> 目前接入的海康设备rtsp回放不太稳定，会经常播放不了(不知道是不是设备的问题)，即使能播放也有很大的延迟
 
 ```java
 @GetMapping(value = "/video/rtspBack.flv",produces = {"video/x-flv;charset=UTF-8"})
@@ -90,7 +90,9 @@ public void flvRtspBack(HttpServletResponse response,HttpServletRequest request)
 ```
 
 ### sdk推流
-- sdk 实时预览
+> sdk 推流，实际上就是调用了海康的sdk，完成了一次播放预览，通过抓流得到码流数据。 播放画面过多，比较耗性能。
+#### 1. sdk 实时预览
+
 ```java
 /**
  * 实时预览
