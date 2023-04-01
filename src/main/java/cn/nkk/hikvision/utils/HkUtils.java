@@ -12,6 +12,7 @@ import cn.nkk.hikvision.callBack.BackDataCallBack;
 import cn.nkk.hikvision.callBack.RealDataCallBack;
 import cn.nkk.hikvision.factory.FlvConverter;
 import cn.nkk.hikvision.factory.M3u8Converter;
+import cn.nkk.hikvision.properties.HiKProperties;
 import cn.nkk.hikvision.sdk.HCNetSDK;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
@@ -39,6 +40,7 @@ public final class HkUtils {
 
     private final static Logger log = LoggerFactory.getLogger(HkUtils.class);
     private static final HCNetSDK hcNetSDK = SpringUtils.getBean(HCNetSDK.class);
+    private static final HiKProperties hiKProperties = SpringUtils.getBean(HiKProperties.class);
 
     /**
      * 加载linux系统类库
@@ -47,9 +49,11 @@ public final class HkUtils {
         if (OsSelectUtil.isLinux()) {
             HCNetSDK.BYTE_ARRAY ptrByteArray1 = new HCNetSDK.BYTE_ARRAY(256);
             HCNetSDK.BYTE_ARRAY ptrByteArray2 = new HCNetSDK.BYTE_ARRAY(256);
+            String strPathCom = hiKProperties.getSdk_path();
+
             //这里是库的绝对路径，请根据实际情况修改，注意改路径必须有访问权限
-            String strPath1 = "/home/LinuxSDK/libcrypto.so";
-            String strPath2 = "/home/LinuxSDK/libssl.so";
+            String strPath1 = strPathCom + "/libcrypto.so";
+            String strPath2 =  strPathCom + "/libssl.so";
 
             System.arraycopy(strPath1.getBytes(), 0, ptrByteArray1.byValue, 0, strPath1.length());
             ptrByteArray1.write();
@@ -59,7 +63,7 @@ public final class HkUtils {
             ptrByteArray2.write();
             hcNetSDK.NET_DVR_SetSDKInitCfg(4, ptrByteArray2.getPointer());
 
-            String strPathCom = "/home/LinuxSDK/";
+
             HCNetSDK.NET_DVR_LOCAL_SDK_PATH struComPath = new HCNetSDK.NET_DVR_LOCAL_SDK_PATH();
             System.arraycopy(strPathCom.getBytes(), 0, struComPath.sPath, 0, strPathCom.length());
             struComPath.write();
