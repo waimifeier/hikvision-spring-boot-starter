@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * spring工具类 方便在非spring管理环境中获取bean
  */
 @Component
-public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationContextAware
+public final class SpringContextHolder implements BeanFactoryPostProcessor, ApplicationContextAware
 {
     /** Spring应用上下文环境 */
     private static ConfigurableListableBeanFactory beanFactory;
@@ -23,13 +23,13 @@ public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationC
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException
     {
-        SpringUtils.beanFactory = beanFactory;
+        SpringContextHolder.beanFactory = beanFactory;
     }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
-        SpringUtils.applicationContext = applicationContext;
+        SpringContextHolder.applicationContext = applicationContext;
     }
 
     /**

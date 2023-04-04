@@ -39,7 +39,7 @@ import java.util.UUID;
 public final class HkUtils {
 
     private final static Logger log = LoggerFactory.getLogger(HkUtils.class);
-    private static final HCNetSDK hcNetSDK = SpringUtils.getBean(HCNetSDK.class);
+    private static final HCNetSDK hcNetSDK = SpringContextHolder.getBean(HCNetSDK.class);
 
 
     /**
@@ -49,7 +49,7 @@ public final class HkUtils {
         if (OsSelectUtil.isLinux()) {
             HCNetSDK.BYTE_ARRAY ptrByteArray1 = new HCNetSDK.BYTE_ARRAY(256);
             HCNetSDK.BYTE_ARRAY ptrByteArray2 = new HCNetSDK.BYTE_ARRAY(256);
-            HiKProperties hiKProperties = SpringUtils.getBean(HiKProperties.class);
+            HiKProperties hiKProperties = SpringContextHolder.getBean(HiKProperties.class);
             String strPathCom = hiKProperties.getSdk_path();
 
             //这里是库的绝对路径，请根据实际情况修改，注意改路径必须有访问权限
@@ -400,7 +400,7 @@ public final class HkUtils {
 
         try {
             PipedOutputStream outputStream = new PipedOutputStream();
-            RealDataCallBack realDataCallBack = SpringUtils.getBean(RealDataCallBack.class);
+            RealDataCallBack realDataCallBack = SpringContextHolder.getBean(RealDataCallBack.class);
             int playHandle = hcNetSDK.NET_DVR_RealPlay_V40(userId, strClientInfo, realDataCallBack , null);
             if(playHandle==-1){
                 int iErr = hcNetSDK.NET_DVR_GetLastError();
@@ -460,7 +460,7 @@ public final class HkUtils {
         }
 
         PipedOutputStream outputStream = new PipedOutputStream();
-        BackDataCallBack backDataCallBack = SpringUtils.getBean(BackDataCallBack.class);
+        BackDataCallBack backDataCallBack = SpringContextHolder.getBean(BackDataCallBack.class);
         backDataCallBack.outputStreamMap.put(playHandle,outputStream);
         // 注册回调函数
         hcNetSDK.NET_DVR_SetPlayDataCallBack(playHandle, backDataCallBack,0);
@@ -554,7 +554,7 @@ public final class HkUtils {
      * @return {@link TaskExecutor}
      */
     public static void rtspToM3u8(String rtspUrl) {
-        ThreadPoolTaskExecutor taskExecutor = SpringUtils.getBean("converterPoolExecutor");
+        ThreadPoolTaskExecutor taskExecutor = SpringContextHolder.getBean("converterPoolExecutor");
         M3u8Converter converter = new M3u8Converter(rtspUrl);
         taskExecutor.submit(converter);
     }
@@ -566,7 +566,7 @@ public final class HkUtils {
      * @return {@link Thread}
      */
     public static void rtspToFlv(String rtspUrl,AsyncContext context){
-        ThreadPoolTaskExecutor taskExecutor = SpringUtils.getBean("converterPoolExecutor");
+        ThreadPoolTaskExecutor taskExecutor = SpringContextHolder.getBean("converterPoolExecutor");
         FlvConverter converter = new FlvConverter(rtspUrl,context);
         taskExecutor.submit(converter);
     }
@@ -578,7 +578,7 @@ public final class HkUtils {
      * @param context     上下文
      */
     public static void streamToFlv(InputStream inputStream, AsyncContext context){
-        ThreadPoolTaskExecutor taskExecutor = SpringUtils.getBean("converterPoolExecutor");
+        ThreadPoolTaskExecutor taskExecutor = SpringContextHolder.getBean("converterPoolExecutor");
         FlvConverter converter = new FlvConverter(inputStream,context);
         taskExecutor.submit(converter);
     }

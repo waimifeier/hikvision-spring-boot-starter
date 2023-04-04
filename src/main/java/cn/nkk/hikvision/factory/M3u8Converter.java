@@ -3,9 +3,8 @@ package cn.nkk.hikvision.factory;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.nkk.hikvision.properties.HiKProperties;
-import cn.nkk.hikvision.utils.HkUtils;
 import cn.nkk.hikvision.utils.Md5Utils;
-import cn.nkk.hikvision.utils.SpringUtils;
+import cn.nkk.hikvision.utils.SpringContextHolder;
 import org.bytedeco.ffmpeg.avcodec.AVPacket;
 import org.bytedeco.ffmpeg.avformat.AVFormatContext;
 import org.bytedeco.ffmpeg.global.avcodec;
@@ -39,7 +38,7 @@ public class M3u8Converter extends Thread implements Converter{
 
     @Override
     public void run() {
-        HiKProperties hiKProperties = SpringUtils.getBean(HiKProperties.class);
+        HiKProperties hiKProperties = SpringContextHolder.getBean(HiKProperties.class);
         if(StrUtil.isEmpty(hiKProperties.getStream().getM3u8_path())){
             throw new IllegalArgumentException("请配置m3u8视频流存储路径");
         }
