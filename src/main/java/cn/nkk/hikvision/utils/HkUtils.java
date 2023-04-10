@@ -179,6 +179,7 @@ public final class HkUtils {
                 // 设置参数
                 CameraLogin.CameraChannel channel = new CameraLogin.CameraChannel();
                 channel.setChannelNum(channelID);
+                channel.setSdkChannelNum(deviceInfo.byStartChan);
                 channel.setIp((new String(dvrIpInfo.struIP.sIpV4)).trim());
                 channel.setPort(dvrIpInfo.wDVRPort);
                 channel.setUserName(new String(dvrIpInfo.sUserName).trim());

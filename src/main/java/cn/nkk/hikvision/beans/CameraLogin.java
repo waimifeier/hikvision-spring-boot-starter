@@ -59,6 +59,8 @@ public class CameraLogin {
      */
     public static class CameraChannel{
 
+        private int sdkChannelNum;
+
         /**
          * 通道号
          */
@@ -163,6 +165,14 @@ public class CameraLogin {
 
         public void setHardwareStatic(Integer hardwareStatic) {
             HardwareStatic = hardwareStatic;
+        }
+
+        public int getSdkChannelNum() {
+            return sdkChannelNum;
+        }
+
+        public void setSdkChannelNum(int sdkChannelNum) {
+            this.sdkChannelNum = sdkChannelNum;
         }
     }
 
