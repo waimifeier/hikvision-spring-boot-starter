@@ -408,7 +408,7 @@ public final class HkUtils {
                 log.error("取流失败,错误码：{}" ,iErr);
                 throw new RuntimeException("取流失败");
             }
-            realDataCallBack.outputStreamMap.put(StrUtil.format("{}-{}",userId,playHandle),outputStream);
+            realDataCallBack.outputStreamMap.put(String.valueOf(playHandle),outputStream);
             log.info("取流成功");
             VideoPreview videoPreview = new VideoPreview();
             videoPreview.setPlayHandler(playHandle);

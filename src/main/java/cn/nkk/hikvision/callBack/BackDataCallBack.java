@@ -1,5 +1,6 @@
 package cn.nkk.hikvision.callBack;
 
+import cn.hutool.core.util.StrUtil;
 import cn.nkk.hikvision.sdk.HCNetSDK;
 import com.sun.jna.ptr.ByteByReference;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ public class BackDataCallBack implements HCNetSDK.FPlayDataCallBack{
             buffers.rewind();
             buffers.get(bytes);
             try {
-                outputStreamMap.get(lPlayHandle).write(bytes);
+                outputStreamMap.get(StrUtil.format("{}-{}",dwUser,lPlayHandle)).write(bytes);
             } catch (IOException e) {
                 log.error("回放预览回调：{}",e.getMessage());
             }
