@@ -22,7 +22,7 @@ import java.util.Map;
 public class RealDataCallBack implements HCNetSDK.FRealDataCallBack_V30 {
 
     private final static Logger log = LoggerFactory.getLogger(RealDataCallBack.class);
-    public Map<Integer,PipedOutputStream> outputStreamMap=new HashMap<>();
+    public Map<String,PipedOutputStream> outputStreamMap=new HashMap<>();
 
     @Override
     public void invoke(int lRealHandle, int dwDataType, ByteByReference pBuffer, int dwBufSize, Pointer pUser) {

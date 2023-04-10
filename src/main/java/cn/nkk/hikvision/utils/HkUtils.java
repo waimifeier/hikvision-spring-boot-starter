@@ -408,7 +408,7 @@ public final class HkUtils {
                 log.error("取流失败,错误码：{}" ,iErr);
                 throw new RuntimeException("取流失败");
             }
-            realDataCallBack.outputStreamMap.put(playHandle,outputStream);
+            realDataCallBack.outputStreamMap.put(StrUtil.format("{}-{}",userId,playHandle),outputStream);
             log.info("取流成功");
             VideoPreview videoPreview = new VideoPreview();
             videoPreview.setPlayHandler(playHandle);
@@ -462,7 +462,7 @@ public final class HkUtils {
 
         PipedOutputStream outputStream = new PipedOutputStream();
         BackDataCallBack backDataCallBack = SpringContextHolder.getBean(BackDataCallBack.class);
-        backDataCallBack.outputStreamMap.put(playHandle,outputStream);
+        backDataCallBack.outputStreamMap.put(StrUtil.format("{}-{}",userId,playHandle),outputStream);
         // 注册回调函数
         hcNetSDK.NET_DVR_SetPlayDataCallBack(playHandle, backDataCallBack,0);
         // 控制录像回放状态  开始回放

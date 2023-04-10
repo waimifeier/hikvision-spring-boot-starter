@@ -23,7 +23,7 @@ public class BackDataCallBack implements HCNetSDK.FPlayDataCallBack{
 
     private final static Logger log = LoggerFactory.getLogger(BackDataCallBack.class);
 
-    public Map<Integer,PipedOutputStream> outputStreamMap=new HashMap<>();
+    public Map<String,PipedOutputStream> outputStreamMap=new HashMap<>();
 
     @Override
     public void invoke(int lPlayHandle, int dwDataType, ByteByReference pBuffer, int dwBufSize, int dwUser) {
