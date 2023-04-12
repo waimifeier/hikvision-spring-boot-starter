@@ -32,7 +32,7 @@ public class RealDataCallBack implements HCNetSDK.FRealDataCallBack_V30 {
             buffers.rewind();
             buffers.get(bytes);
             try {
-                outputStreamMap.get(lRealHandle).write(bytes);
+                outputStreamMap.get(String.valueOf(lRealHandle)).write(bytes);
             } catch (IOException e) {
                 log.error("实时预览回调：{}",e.getMessage());
             }
