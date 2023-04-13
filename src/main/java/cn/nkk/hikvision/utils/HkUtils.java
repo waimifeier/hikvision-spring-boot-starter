@@ -465,7 +465,7 @@ public final class HkUtils {
         BackDataCallBack backDataCallBack = SpringContextHolder.getBean(BackDataCallBack.class);
         backDataCallBack.outputStreamMap.put(StrUtil.format("{}-{}",userId,playHandle),outputStream);
         // 注册回调函数
-        hcNetSDK.NET_DVR_SetPlayDataCallBack(playHandle, backDataCallBack,0);
+        hcNetSDK.NET_DVR_SetPlayDataCallBack(playHandle, backDataCallBack,userId);
         // 控制录像回放状态  开始回放
         hcNetSDK.NET_DVR_PlayBackControl(playHandle, HCNetSDK.NET_DVR_PLAYSTART, 0, null);
         // 控制历史回放拉流推流时的速度和直播一致
@@ -576,8 +576,9 @@ public final class HkUtils {
     /**
      * 视频码流转flv
      *
-     * @param inputStream 输入流
+     * @param outputStream 输出流
      * @param context     上下文
+     * @param playHandler 播放句柄
      */
     public static void streamToFlv(PipedOutputStream outputStream, AsyncContext context,Integer playHandler){
         ThreadPoolTaskExecutor taskExecutor = SpringContextHolder.getBean("converterPoolExecutor");
