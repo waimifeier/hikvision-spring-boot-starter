@@ -73,6 +73,8 @@ public class FlvConverter extends Thread implements Converter{
                 grabber.setOption("stimeout", "5000000");
                 log.info("rtsp链接------------------------");
             }
+            grabber.setImageHeight(480);
+            grabber.setImageWidth(860);
             grabber.start();
             int videoCodec = grabber.getVideoCodec();
             log.info("启动grabber,编码{}------------------------",videoCodec);
