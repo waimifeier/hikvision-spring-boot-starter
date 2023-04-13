@@ -34,7 +34,7 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <hutool.version>5.7.11</hutool.version>
-        <javacv-platform.version>1.5.1</javacv-platform.version>
+        <javacv-platform.version>1.5.3</javacv-platform.version>
         <jna.version>3.0.9</jna.version>
     </properties>
 

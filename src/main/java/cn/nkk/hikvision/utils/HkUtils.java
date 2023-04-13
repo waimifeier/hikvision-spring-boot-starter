@@ -458,6 +458,7 @@ public final class HkUtils {
 
         if(playHandle<0){
             int v30ErrorCode = hcNetSDK.NET_DVR_GetLastError();
+            throw new RuntimeException("文件查询失败,code:"+v30ErrorCode);
         }
 
         PipedOutputStream outputStream = new PipedOutputStream();
@@ -578,9 +579,9 @@ public final class HkUtils {
      * @param inputStream 输入流
      * @param context     上下文
      */
-    public static void streamToFlv(InputStream inputStream, AsyncContext context){
+    public static void streamToFlv(PipedOutputStream outputStream, AsyncContext context,Integer playHandler){
         ThreadPoolTaskExecutor taskExecutor = SpringContextHolder.getBean("converterPoolExecutor");
-        FlvConverter converter = new FlvConverter(inputStream,context);
+        FlvConverter converter = new FlvConverter(outputStream,context,playHandler);
         taskExecutor.submit(converter);
     }
 }

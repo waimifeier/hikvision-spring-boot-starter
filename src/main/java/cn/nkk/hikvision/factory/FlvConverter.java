@@ -2,6 +2,7 @@ package cn.nkk.hikvision.factory;
 
 
 import cn.hutool.core.util.StrUtil;
+import cn.nkk.hikvision.utils.HkUtils;
 import org.bytedeco.ffmpeg.global.avcodec;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
@@ -12,7 +13,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.AsyncContext;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.Iterator;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -24,33 +26,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class FlvConverter extends Thread implements Converter{
 
-    private final static Logger log = LoggerFactory.getLogger(FlvConverter.class);
-
-
+    private static final Logger log = LoggerFactory.getLogger(FlvConverter.class);
     private byte[] headers;
-
-    /**
-     * rtsp url
-     */
     private String rtspUrl;
 
-    /**
-     * 输入流
-     */
-    private InputStream inputStream;
-
-    /**
-     * 异步上下文
-     */
     private AsyncContext context;
 
+    private Integer playHandler;
 
-    /**
-     * flv转换器 通过rtsp转换
-     *
-     * @param rtspUrl rtsp url
-     */
-    public FlvConverter(String rtspUrl, AsyncContext context){
+    private PipedOutputStream outputStream;
+
+    public FlvConverter(String rtspUrl, AsyncContext context) {
         this.rtspUrl = rtspUrl;
         this.context = context;
     }
@@ -58,11 +44,14 @@ public class FlvConverter extends Thread implements Converter{
     /**
      * flv转换器 通过输入流转换
      *
-     * @param inputStream 输入流
+     * @param outputStream 输出流
+     * @param context 上下文
+     * @param playHandler 播放句柄
      */
-    public FlvConverter(InputStream inputStream, AsyncContext context){
-        this.inputStream = inputStream;
+    public FlvConverter(PipedOutputStream outputStream,AsyncContext context,Integer playHandler) {
         this.context = context;
+        this.outputStream = outputStream;
+        this.playHandler = playHandler;
     }
 
     @Override
@@ -70,16 +59,23 @@ public class FlvConverter extends Thread implements Converter{
         FFmpegFrameGrabber grabber = null;
         FFmpegFrameRecorder recorder = null;
         ByteArrayOutputStream stream = null;
+        PipedInputStream inputStream = null;
         try {
-            grabber = Objects.nonNull(inputStream) ? new FFmpegFrameGrabber(inputStream) : new FFmpegFrameGrabber(rtspUrl);
-            if (StrUtil.isNotEmpty(rtspUrl) && "rtsp".equals(rtspUrl.substring(0, 4))) {
+
+            if(Objects.nonNull(outputStream)){
+                inputStream = new PipedInputStream(this.outputStream);
+                grabber = new FFmpegFrameGrabber(inputStream,0);
+            }else {
+                grabber = new FFmpegFrameGrabber(rtspUrl);
+            }
+            if (StrUtil.isNotEmpty(rtspUrl) && rtspUrl.startsWith("rtsp")) {
                 grabber.setOption("rtsp_transport", "tcp");
                 grabber.setOption("stimeout", "5000000");
+                log.info("rtsp链接------------------------");
             }
             grabber.start();
-
-            // 来源视频H264格式,音频AAC格式
-            grabber.setFrameRate(25);
+            int videoCodec = grabber.getVideoCodec();
+            log.info("启动grabber,编码{}------------------------",videoCodec);
             if (grabber.getImageWidth() > 1920) {
                 grabber.setImageWidth(1920);
             }
@@ -88,7 +84,7 @@ public class FlvConverter extends Thread implements Converter{
             }
 
             stream = new ByteArrayOutputStream();
-            recorder = new FFmpegFrameRecorder(stream, grabber.getImageWidth(), grabber.getImageHeight(),grabber.getAudioChannels());
+            recorder = new FFmpegFrameRecorder(stream, grabber.getImageWidth(), grabber.getImageHeight(), grabber.getAudioChannels());
             recorder.setInterleaved(true);
             recorder.setVideoOption("preset", "ultrafast");
             recorder.setVideoOption("tune", "zerolatency");
@@ -111,7 +107,7 @@ public class FlvConverter extends Thread implements Converter{
                 writeResponse(headers);
             }
 
-            while (true){
+            while (true) {
                 Frame f = grabber.grab();
                 if (f != null) {
                     // 转码
@@ -121,7 +117,7 @@ public class FlvConverter extends Thread implements Converter{
                         stream.reset();
                         try {
                             context.getResponse().getOutputStream().write(byteArray);
-                        } catch (Exception e){
+                        } catch (Exception e) {
                             context.complete();
                             break;
                         }
@@ -129,19 +125,27 @@ public class FlvConverter extends Thread implements Converter{
                 }
                 TimeUnit.MILLISECONDS.sleep(5);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
+            log.info("异步出错------------------------"+e.getMessage());
             e.printStackTrace();
         } finally {
             try {
+                log.info("执行资源回收----------------------");
+                if(this.outputStream!=null) this.outputStream.close();
+                if(inputStream != null) inputStream.close();
+                if(this.playHandler!= null) HkUtils.stopBackPlay(this.playHandler);
+                log.info("执行资源回收2----------------------");
+                if(grabber!= null) grabber.close();
+                if (recorder != null) recorder.close();
+                if (stream != null) stream.close();
+                log.info("执行资源回收3----------------------");
                 context.getResponse().flushBuffer();
                 context.complete();
-               // if(grabber != null) grabber.close();
-                if(recorder != null) recorder.close();
-                if(stream != null) stream.close();
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
     }
 
 
