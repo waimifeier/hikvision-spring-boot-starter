@@ -37,7 +37,7 @@ maven 坐标
 <dependency>
     <groupId>com.github.waimifeier</groupId>
     <artifactId>hikvision-spring-boot-starter</artifactId>
-    <version>最新版本</version>
+    <version>1.1.4</version>
 </dependency>
 ```
 
@@ -49,6 +49,13 @@ maven 坐标
 hik:
   sdk-path: classpath:sdk/win
 ```
+- 配置类上扫码包
+
+```java
+import org.springframework.context.annotation.ComponentScan;
+@ComponentScan("cn.nkk.hikvision")
+```
+
 ## 案例
 ### rtsp推流
 
