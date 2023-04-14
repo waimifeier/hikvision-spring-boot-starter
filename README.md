@@ -43,7 +43,7 @@ maven 坐标
 
 
 ### 项目配置
-
+> 海康sdk库文件需要去[海康官网下载]('https://open.hikvision.com/download/5cda567cf47ae80dd41a54b3?type=undefined') ,区分window版和linux版
 ```yaml
 # 配置海康威视 sdk 位置
 hik:
