@@ -153,3 +153,7 @@ public void flvSdkBack(HttpServletResponse response,HttpServletRequest request){
 
 ### 前端播放实现
 > 推荐使用播放器 [LivePlayer](https://www.liveqing.com/docs/manuals/LivePlayer.html) 或 [xgplayer](https://v2.h5player.bytedance.com/gettingStarted/) 
+
+
+效果展示: 
+![img.png](img.png)
