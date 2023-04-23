@@ -104,7 +104,7 @@ public void flvRtspBack(HttpServletResponse response,HttpServletRequest request)
  * 实时预览
  */
 @GetMapping(value = "/video/sdkReal.flv",produces = {"video/x-flv;charset=UTF-8"})
-    public void flvSdkReal(HttpServletResponse response,HttpServletRequest request){
+public void flvSdkReal(HttpServletResponse response,HttpServletRequest request){
 
         AsyncContext asyncContext = request.startAsync();
         asyncContext.setTimeout(0);
@@ -112,32 +112,15 @@ public void flvRtspBack(HttpServletResponse response,HttpServletRequest request)
         // sdk抓流，必须登陆
         CameraLogin cameraLogin = HkUtils.doLogin("ip", "端口", "账号", "密码");
 
-        // 开启实时预览 （参数二为通道号，可从登陆信息获取到）
+        // sdk开启实时预览 （参数二为通道号，可从登陆信息获取到）
         VideoPreview videoPreview = HkUtils.startRelaPlay(cameraLogin.getUserId(),17);
         PipedOutputStream outputStream = videoPreview.getOutputStream();
-        PipedInputStream inputStream = new PipedInputStream();
+
         try {
-            inputStream.connect(outputStream);
-            byte[] bytes = new byte[1024];
-            int len = 0;
-            while ((len = inputStream.read(bytes)) != -1) {
-                asyncContext.getResponse().getOutputStream().write(bytes);
-                response.setContentType("video/x-flv");
-                response.setHeader("Connection", "keep-alive");
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.flushBuffer();
-            }
+           // 使用抓流器进行转码
+            HkUtils.streamToFlv(outputStream,asyncContext,videoPreview.getPlayHandler());
         }catch (Exception e){
             e.printStackTrace();
-        } finally {
-            try {
-                asyncContext.complete();
-                HkUtils.stopRelaPlay(videoPreview.getPlayHandler()); // 记得关闭预览
-                if(outputStream!=null) outputStream.close();
-                if(inputStream!=null) inputStream.close();
-            } catch (Exception e){
-                e.printStackTrace();
-            }
         }
     }
 ```
@@ -149,7 +132,7 @@ public void flvRtspBack(HttpServletResponse response,HttpServletRequest request)
  * 回放预览
  */
 @GetMapping(value = "/video/sdkBack.flv",produces = {"video/x-flv;charset=UTF-8"})
-    public void flvSdkBack(HttpServletResponse response,HttpServletRequest request){
+public void flvSdkBack(HttpServletResponse response,HttpServletRequest request){
 
         AsyncContext asyncContext = request.startAsync();
         asyncContext.setTimeout(0);
@@ -157,32 +140,16 @@ public void flvRtspBack(HttpServletResponse response,HttpServletRequest request)
         // sdk抓流，必须登陆
         CameraLogin cameraLogin = HkUtils.doLogin("ip", "端口", "账号", "密码");
 
-        // 开启实时预览 （参数二为通道号，可从登陆信息获取到）
+        // 使用sdk开启回放预览 （参数二为通道号，可从登陆信息获取到）
         VideoPreview videoPreview = HkUtils.startBackPlay(cameraLogin.getUserId(),17,"开始时间","结束时间");
         PipedOutputStream outputStream = videoPreview.getOutputStream();
-        PipedInputStream inputStream = new PipedInputStream();
         try {
-            inputStream.connect(outputStream);
-            byte[] bytes = new byte[1024];
-            int len = 0;
-            while ((len = inputStream.read(bytes)) != -1) {
-                asyncContext.getResponse().getOutputStream().write(bytes);
-                response.setContentType("video/x-flv");
-                response.setHeader("Connection", "keep-alive");
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.flushBuffer();
-            }
+            HkUtils.streamToFlv(outputStream,asyncContext,videoPreview.getPlayHandler());
         }catch (Exception e){
             e.printStackTrace();
-        } finally {
-            try {
-                asyncContext.complete();
-                HkUtils.stopBackPlay(videoPreview.getPlayHandler()); // 记得关闭回放预览
-                if(outputStream!=null) outputStream.close();
-                if(inputStream!=null) inputStream.close();
-            } catch (Exception e){
-                e.printStackTrace();
-            }
         }
     }
 ```
+
+### 前端播放实现
+> 推荐使用播放器 [xgplayer](https://v2.h5player.bytedance.com/gettingStarted/) ,获取其他可以播放flv格式的网络播放
