@@ -152,4 +152,4 @@ public void flvSdkBack(HttpServletResponse response,HttpServletRequest request){
 ```
 
 ### 前端播放实现
-> 推荐使用播放器 [xgplayer](https://v2.h5player.bytedance.com/gettingStarted/) ,获取其他可以播放flv格式的网络播放
+> 推荐使用播放器 [LivePlayer](https://www.liveqing.com/docs/manuals/LivePlayer.html) 或 [xgplayer](https://v2.h5player.bytedance.com/gettingStarted/) 
