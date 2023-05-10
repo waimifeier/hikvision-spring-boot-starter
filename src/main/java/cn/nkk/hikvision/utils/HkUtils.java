@@ -25,6 +25,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import javax.servlet.AsyncContext;
 import java.io.File;
 import java.io.InputStream;
+import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -464,12 +465,13 @@ public final class HkUtils {
         PipedOutputStream outputStream = new PipedOutputStream();
         BackDataCallBack backDataCallBack = SpringContextHolder.getBean(BackDataCallBack.class);
         backDataCallBack.outputStreamMap.put(StrUtil.format("{}-{}",userId,playHandle),outputStream);
+
         // 注册回调函数
         hcNetSDK.NET_DVR_SetPlayDataCallBack(playHandle, backDataCallBack,userId);
         // 控制录像回放状态  开始回放
         hcNetSDK.NET_DVR_PlayBackControl(playHandle, HCNetSDK.NET_DVR_PLAYSTART, 0, null);
         // 控制历史回放拉流推流时的速度和直播一致
-        //hcNetSDK.NET_DVR_PlayBackControl(v30FindRes, HCNetSDK.NET_DVR_SETSPEED,2048, null);
+        //hcNetSDK.NET_DVR_PlayBackControl(playHandle, HCNetSDK.NET_DVR_PLAYNORMAL,0, null);
 
         VideoPreview videoPreview = new VideoPreview();
         videoPreview.setPlayHandler(playHandle);
@@ -489,7 +491,7 @@ public final class HkUtils {
     public static void stopBackPlay(int playHandle){
         hcNetSDK.NET_DVR_PlayBackControl(playHandle, HCNetSDK.NET_DVR_PLAYSTOPAUDIO, 0, null);
         hcNetSDK.NET_DVR_StopPlayBack(playHandle);
-        log.info("停止回放预览");
+        log.info("停止回放预览{}",playHandle);
     }
 
 
@@ -580,9 +582,10 @@ public final class HkUtils {
      * @param context     上下文
      * @param playHandler 播放句柄
      */
-    public static void streamToFlv(PipedOutputStream outputStream, AsyncContext context,Integer playHandler){
+    public static void streamToFlv(PipedInputStream inputStream,PipedOutputStream outputStream, AsyncContext context,Integer playHandler){
         ThreadPoolTaskExecutor taskExecutor = SpringContextHolder.getBean("converterPoolExecutor");
-        FlvConverter converter = new FlvConverter(outputStream,context,playHandler);
+        FlvConverter converter = new FlvConverter(inputStream,outputStream,context,playHandler);
+        log.info("线程池主动执行任务的线程的大致数,{}",taskExecutor.getActiveCount());
         taskExecutor.submit(converter);
     }
 }

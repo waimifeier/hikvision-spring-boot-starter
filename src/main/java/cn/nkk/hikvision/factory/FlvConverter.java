@@ -12,12 +12,18 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.AsyncContext;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * flv转换器
+ *
+ * @author dlj
+ * @date 2023/03/29
+ */
 /**
  * flv转换器
  *
@@ -29,8 +35,9 @@ public class FlvConverter extends Thread implements Converter{
     private static final Logger log = LoggerFactory.getLogger(FlvConverter.class);
     private byte[] headers;
     private String rtspUrl;
-
+    private PipedInputStream inputStream;
     private AsyncContext context;
+
 
     private Integer playHandler;
 
@@ -44,11 +51,10 @@ public class FlvConverter extends Thread implements Converter{
     /**
      * flv转换器 通过输入流转换
      *
-     * @param outputStream 输出流
-     * @param context 上下文
-     * @param playHandler 播放句柄
+     * @param inputStream 输入流
      */
-    public FlvConverter(PipedOutputStream outputStream,AsyncContext context,Integer playHandler) {
+    public FlvConverter(PipedInputStream inputStream, PipedOutputStream outputStream, AsyncContext context, Integer playHandler) {
+        this.inputStream = inputStream;
         this.context = context;
         this.outputStream = outputStream;
         this.playHandler = playHandler;
@@ -59,23 +65,31 @@ public class FlvConverter extends Thread implements Converter{
         FFmpegFrameGrabber grabber = null;
         FFmpegFrameRecorder recorder = null;
         ByteArrayOutputStream stream = null;
-        PipedInputStream inputStream = null;
         try {
-
-            if(Objects.nonNull(outputStream)){
-                inputStream = new PipedInputStream(this.outputStream);
-                grabber = new FFmpegFrameGrabber(inputStream,0);
-            }else {
-                grabber = new FFmpegFrameGrabber(rtspUrl);
-            }
+            log.info("进入grabber------------------------");
+            grabber = Objects.nonNull(inputStream) ? new FFmpegFrameGrabber(inputStream,0) : new FFmpegFrameGrabber(rtspUrl);
             if (StrUtil.isNotEmpty(rtspUrl) && rtspUrl.startsWith("rtsp")) {
                 grabber.setOption("rtsp_transport", "tcp");
-                grabber.setOption("stimeout", "5000000");
+                //首选TCP进行RTP传输
+                grabber.setOption("rtsp_flags", "prefer_tcp");
                 log.info("rtsp链接------------------------");
             }
-            grabber.setImageHeight(480);
-            grabber.setImageWidth(860);
-            grabber.start();
+            if(Objects.nonNull(inputStream)){
+                //检测管道流中是否存在数据，如果2s后依然没有写入1024的数据，则认为管道流中无数据，避免grabber.start();发生阻塞
+                long stime = new Date().getTime();
+                while (true) {
+                    Thread.sleep(100);
+                    if (new Date().getTime() - stime > 2000) {
+                        return;
+                    }
+                    if (inputStream.available() == 1024) {
+                        break;
+                    }
+                }
+            }
+            // 设置缓存大小，提高画质、减少卡顿花屏
+            grabber.setOption("buffer_size", "1024000");
+            grabber.startUnsafe();
             int videoCodec = grabber.getVideoCodec();
             log.info("启动grabber,编码{}------------------------",videoCodec);
             if (grabber.getImageWidth() > 1920) {
@@ -132,15 +146,13 @@ public class FlvConverter extends Thread implements Converter{
             e.printStackTrace();
         } finally {
             try {
-                log.info("执行资源回收----------------------");
                 if(this.outputStream!=null) this.outputStream.close();
-                if(inputStream != null) inputStream.close();
+                if(this.inputStream != null) this.inputStream.close();
                 if(this.playHandler!= null) HkUtils.stopBackPlay(this.playHandler);
-                log.info("执行资源回收2----------------------");
                 if(grabber!= null) grabber.close();
                 if (recorder != null) recorder.close();
                 if (stream != null) stream.close();
-                log.info("执行资源回收3----------------------");
+                log.info("资源回收完成----------------------");
                 context.getResponse().flushBuffer();
                 context.complete();
             } catch (Exception e) {
