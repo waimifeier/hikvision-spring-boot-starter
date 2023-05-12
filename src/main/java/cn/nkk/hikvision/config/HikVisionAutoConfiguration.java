@@ -76,7 +76,7 @@ public class HikVisionAutoConfiguration {
                 //Linux系统加载库路径
                 else if (OsSelectUtil.isLinux())
                     strPlayPath = properties.getSdk_path().startsWith("classpath") ?
-                            ResourceUtils.getFile(properties.getSdk_path()+"/libPlayCtrl.dll").getPath() : properties.getSdk_path()+"/libPlayCtrl.dll";
+                            ResourceUtils.getFile(properties.getSdk_path()+"/libPlayCtrl.so").getPath() : properties.getSdk_path()+"/libPlayCtrl.so";
                 playControl = (PlayCtrl) Native.loadLibrary(strPlayPath,PlayCtrl.class);
             } catch (Exception ex) {
                 log.error("加载playControl失败}");
