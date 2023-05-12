@@ -29,6 +29,8 @@ public class HikVisionAutoConfiguration {
 
    private HCNetSDK hCNetSDK = null;
 
+  private PlayCtrl playControl = null;
+
    public HikVisionAutoConfiguration(HiKProperties properties){
        if(properties.getSdk_path()==null){
            throw new IllegalArgumentException("请指定sdk类库（注意区分系统版本）");

@@ -1,10 +1,11 @@
 package cn.nkk.hikvision.sdk;
+
 import com.sun.jna.*;
 import com.sun.jna.examples.win32.W32API.HWND;
 import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.IntByReference;
 
-//播放库函数声明,PlayCtrl.dll
+
 public interface PlayCtrl extends Library {
     public static final int STREAME_REALTIME = 0;
     public static final int STREAME_FILE = 1;
