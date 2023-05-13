@@ -92,12 +92,8 @@ public class FlvConverter extends Thread implements Converter{
             grabber.startUnsafe();
             int videoCodec = grabber.getVideoCodec();
             log.info("启动grabber,编码{}------------------------",videoCodec);
-            if (grabber.getImageWidth() > 1920) {
-                grabber.setImageWidth(1920);
-            }
-            if (grabber.getImageHeight() > 1080) {
-                grabber.setImageHeight(1080);
-            }
+            grabber.setImageWidth(640);
+            grabber.setImageHeight(480);
 
             stream = new ByteArrayOutputStream();
             recorder = new FFmpegFrameRecorder(stream, grabber.getImageWidth(), grabber.getImageHeight(), grabber.getAudioChannels());
