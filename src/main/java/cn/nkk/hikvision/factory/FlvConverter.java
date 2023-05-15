@@ -4,6 +4,7 @@ package cn.nkk.hikvision.factory;
 import cn.hutool.core.util.StrUtil;
 import cn.nkk.hikvision.utils.HkUtils;
 import org.bytedeco.ffmpeg.global.avcodec;
+import org.bytedeco.ffmpeg.global.avutil;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
 import org.bytedeco.javacv.Frame;
@@ -66,6 +67,7 @@ public class FlvConverter extends Thread implements Converter{
         FFmpegFrameRecorder recorder = null;
         ByteArrayOutputStream stream = null;
         try {
+            avutil.av_log_set_level(avutil.AV_LOG_ERROR);
             log.info("进入grabber------------------------");
             grabber = Objects.nonNull(inputStream) ? new FFmpegFrameGrabber(inputStream,0) : new FFmpegFrameGrabber(rtspUrl);
             if (StrUtil.isNotEmpty(rtspUrl) && rtspUrl.startsWith("rtsp")) {
