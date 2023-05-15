@@ -121,18 +121,19 @@ public class FlvConverter extends Thread implements Converter{
 
             while (true) {
                 Frame f = grabber.grab();
-                if (f != null) {
-                    // 转码
-                    recorder.record(f);
-                    if (stream.size() > 0) {
-                        byte[] byteArray = stream.toByteArray();
-                        stream.reset();
-                        try {
-                            context.getResponse().getOutputStream().write(byteArray);
-                        } catch (Exception e) {
-                            context.complete();
-                            break;
-                        }
+                if (f == null) {
+                    break;
+                }
+                // 转码
+                recorder.record(f);
+                if (stream.size() > 0) {
+                    byte[] byteArray = stream.toByteArray();
+                    stream.reset();
+                    try {
+                        context.getResponse().getOutputStream().write(byteArray);
+                    } catch (Exception e) {
+                        context.complete();
+                        break;
                     }
                 }
                 TimeUnit.MILLISECONDS.sleep(5);
