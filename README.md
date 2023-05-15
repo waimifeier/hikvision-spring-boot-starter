@@ -37,7 +37,7 @@ maven 坐标
 <dependency>
     <groupId>com.github.waimifeier</groupId>
     <artifactId>hikvision-spring-boot-starter</artifactId>
-    <version>1.1.5</version>
+    <version>1.1.8</version>
 </dependency>
 ```
 
