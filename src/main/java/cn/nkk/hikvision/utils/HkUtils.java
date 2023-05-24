@@ -259,11 +259,11 @@ public final class HkUtils {
         hcNetSDK.NET_DVR_Init();
         hcNetSDK.NET_DVR_SetConnectTime(2000,1);
         hcNetSDK.NET_DVR_SetReconnect(10000,true);
-        HCNetSDK.NET_DVR_LOCAL_GENERAL_CFG struNET_DVR_LOCAL_GENERAL_CFG = new HCNetSDK.NET_DVR_LOCAL_GENERAL_CFG();
+        /*HCNetSDK.NET_DVR_LOCAL_GENERAL_CFG struNET_DVR_LOCAL_GENERAL_CFG = new HCNetSDK.NET_DVR_LOCAL_GENERAL_CFG();
         struNET_DVR_LOCAL_GENERAL_CFG.byAlarmJsonPictureSeparate = 1;   //设置JSON透传报警数据和图片分离
         struNET_DVR_LOCAL_GENERAL_CFG.write();
         Pointer pStrNET_DVR_LOCAL_GENERAL_CFG = struNET_DVR_LOCAL_GENERAL_CFG.getPointer();
-        hcNetSDK.NET_DVR_SetSDKLocalCfg(17, pStrNET_DVR_LOCAL_GENERAL_CFG);
+        hcNetSDK.NET_DVR_SetSDKLocalCfg(17, pStrNET_DVR_LOCAL_GENERAL_CFG);*/
 
         int lListenHandle = hcNetSDK.NET_DVR_StartListen_V30(ip, Short.parseShort(port), callback, null);
         if (lListenHandle == -1) {
