@@ -115,10 +115,11 @@ public void flvSdkReal(HttpServletResponse response,HttpServletRequest request){
         // sdk开启实时预览 （参数二为通道号，可从登陆信息获取到）
         VideoPreview videoPreview = HkUtils.startRelaPlay(cameraLogin.getUserId(),17);
         PipedOutputStream outputStream = videoPreview.getOutputStream();
-
+        PipedInputStream inputStream=new PipedInputStream();
         try {
            // 使用抓流器进行转码
-            HkUtils.streamToFlv(outputStream,asyncContext,videoPreview.getPlayHandler());
+           inputStream.connect(outputStream);
+           HkUtils.streamToFlv(inputStream,outputStream,asyncContext,videoPreview.getPlayHandler());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -143,8 +144,10 @@ public void flvSdkBack(HttpServletResponse response,HttpServletRequest request){
         // 使用sdk开启回放预览 （参数二为通道号，可从登陆信息获取到）
         VideoPreview videoPreview = HkUtils.startBackPlay(cameraLogin.getUserId(),17,"开始时间","结束时间");
         PipedOutputStream outputStream = videoPreview.getOutputStream();
+        PipedInputStream inputStream=new PipedInputStream();
         try {
-            HkUtils.streamToFlv(outputStream,asyncContext,videoPreview.getPlayHandler());
+            inputStream.connect(outputStream);
+            HkUtils.streamToFlv(inputStream,outputStream,asyncContext,videoPreview.getPlayHandler());
         }catch (Exception e){
             e.printStackTrace();
         }
