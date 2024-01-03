@@ -98,12 +98,12 @@ public final class HkUtils {
 
         //如果注册失败返回-1，获取错误码
         if ( userId < 0 ){
-            log.error("设备注册失败：{}",hcNetSDK.NET_DVR_GetLastError());
+             log.error("设备{},注册失败：{}",ip,hcNetSDK.NET_DVR_GetLastError());
             throw new RuntimeException("登陆失败");
         }
 
         String serialNumber = new String(m_strDeviceInfo.sSerialNumber).trim();
-        log.info("设备注册成功,userId={}，设备编号：{}",userId,serialNumber);
+        log.info("设备{},注册成功,userId={}，设备编号：{}",ip,userId,serialNumber);
 
         int maxIpChannelNum = getChannelNum(m_strDeviceInfo);
         List<CameraLogin.CameraChannel> listChannel = getChannelNumber(userId, maxIpChannelNum, m_strDeviceInfo);
@@ -289,7 +289,7 @@ public final class HkUtils {
      * @param endTime 结束时间
      * @param disk 磁盘目录
      */
-    public static void downloadFileToDisk(int userId, int channelNum, String beginTime, String endTime, File disk) throws Exception{
+    public static String downloadFileToDisk(int userId, int channelNum, String beginTime, String endTime, File disk) throws Exception{
 
         if(FileUtil.isFile(disk)){
             throw new RuntimeException("disk参数必须是磁盘目录");
@@ -328,6 +328,7 @@ public final class HkUtils {
 
         // 释放查询资源
         hcNetSDK.NET_DVR_StopGetFile(downloadRes);
+        return videoPath;
     }
 
     /**
