@@ -306,7 +306,7 @@ public final class HkUtils {
         downloadData.byDrawFrame = 0;
         downloadData.byStreamType = 0;
 
-        String videoPath = disk.getPath()+"\\"+ UUID.randomUUID().toString()+".mp4";
+        String videoPath = disk.getPath()+ File.separator + UUID.randomUUID().toString()+".mp4";
         int downloadRes = hcNetSDK.NET_DVR_GetFileByTime_V40(userId, videoPath, downloadData);
         if(downloadRes<0){
             int errorCode = hcNetSDK.NET_DVR_GetLastError();
