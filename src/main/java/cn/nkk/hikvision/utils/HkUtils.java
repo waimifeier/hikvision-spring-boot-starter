@@ -328,6 +328,17 @@ public final class HkUtils {
 
         // 释放查询资源
         hcNetSDK.NET_DVR_StopGetFile(downloadRes);
+        
+        // 转换成mp4格式，否者在linux下无法播放
+        String convertPath = disk.getPath()+ File.separator + UUID.randomUUID().toString()+".mp4";
+        try{
+            boolean complete = VideoConvertUtil.convert(videoPath, convertPath);
+            if(complete){
+                FileUtil.del(videoPath);
+                return convertPath;
+            }
+        }catch (Exception ignore) {}
+        
         return videoPath;
     }
 
