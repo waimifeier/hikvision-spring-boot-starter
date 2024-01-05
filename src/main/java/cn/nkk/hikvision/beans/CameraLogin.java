@@ -17,6 +17,11 @@ public class CameraLogin {
     // 通道数
     private Integer channelNum;
 
+    /**
+     * 布防ID
+     */
+    private int alarmId;
+
     // 通道列表
     private List<CameraChannel> channels;
 
@@ -50,6 +55,14 @@ public class CameraLogin {
 
     public void setChannels(List<CameraChannel> channels) {
         this.channels = channels;
+    }
+
+    public int getAlarmId() {
+        return alarmId;
+    }
+
+    public void setAlarmId(int alarmId) {
+        this.alarmId = alarmId;
     }
 
     /**
