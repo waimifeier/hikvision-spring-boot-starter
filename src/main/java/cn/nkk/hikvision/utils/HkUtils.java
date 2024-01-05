@@ -210,9 +210,9 @@ public final class HkUtils {
      * @param userId 用户id
      * @return int 返回布防id
      */
-    public static int setupAlarmChan(int userId, HCNetSDK.FMSGCallBack callBack) {
+    public static int setupAlarmChan(int userId, HCNetSDK.FMSGCallBack_V31 callBack) {
 
-        hcNetSDK.NET_DVR_SetDVRMessageCallBack_V30(callBack, null);
+        hcNetSDK.NET_DVR_SetDVRMessageCallBack_V31(callBack, null);
 
         //布防参数
         HCNetSDK.NET_DVR_SETUPALARM_PARAM m_strAlarmInfo = new HCNetSDK.NET_DVR_SETUPALARM_PARAM();
