@@ -32,7 +32,7 @@ public class HikVisionAutoConfiguration {
 
    private HCNetSDK hCNetSDK = null;
 
-  private PlayCtrl playControl = null;
+   private PlayCtrl playControl = null;
 
    public HikVisionAutoConfiguration(HiKProperties properties){
        if(properties.getSdk_path()==null){
@@ -120,6 +120,7 @@ public class HikVisionAutoConfiguration {
     public void destroy(){
         //SDK反初始化，释放资源，只需要退出时调用一次
         if (null!=hCNetSDK) {
+            log.info("释放hcNetSDK资源");
             hCNetSDK.NET_DVR_Cleanup();
         }
     }

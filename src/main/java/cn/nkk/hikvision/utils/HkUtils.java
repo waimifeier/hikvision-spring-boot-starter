@@ -10,6 +10,7 @@ import cn.nkk.hikvision.beans.VideoFile;
 import cn.nkk.hikvision.beans.VideoPreview;
 import cn.nkk.hikvision.callBack.BackDataCallBack;
 import cn.nkk.hikvision.callBack.RealDataCallBack;
+import cn.nkk.hikvision.events.FExceptionCallBack;
 import cn.nkk.hikvision.factory.FlvConverter;
 import cn.nkk.hikvision.factory.M3u8Converter;
 import cn.nkk.hikvision.properties.HiKProperties;
@@ -112,6 +113,13 @@ public final class HkUtils {
         cameraInfo.setUserId(userId);
         cameraInfo.setChannels(listChannel);
         cameraInfo.setSerialNumber(serialNumber);
+
+        Pointer pUser = null;
+
+        // 监听异常信息
+        HCNetSDK.FExceptionCallBack fExceptionCallBack = new FExceptionCallBack();
+        hcNetSDK.NET_DVR_SetExceptionCallBack_V30(0,0,fExceptionCallBack, pUser);
+
         return cameraInfo;
     }
 
@@ -202,23 +210,26 @@ public final class HkUtils {
      * @param userId 用户id
      * @return int 返回布防id
      */
-    public static int setupAlarmChan(int userId) {
+    public static int setupAlarmChan(int userId, HCNetSDK.FMSGCallBack callBack) {
+
+        hcNetSDK.NET_DVR_SetDVRMessageCallBack_V30(callBack, null);
+
         //布防参数
         HCNetSDK.NET_DVR_SETUPALARM_PARAM m_strAlarmInfo = new HCNetSDK.NET_DVR_SETUPALARM_PARAM();
         m_strAlarmInfo.dwSize = m_strAlarmInfo.size();
         m_strAlarmInfo.byLevel = 1; //布防优先级：0- 一等级（高），1- 二等级（中）
         m_strAlarmInfo.byAlarmInfoType = 1; //上传报警信息类型: 0- 老报警信息(NET_DVR_PLATE_RESULT), 1- 新报警信息(NET_ITS_PLATE_RESULT)
-        m_strAlarmInfo.byDeployType = 1;
+        m_strAlarmInfo.byDeployType = 1; //布防类型：0-客户端布防，1-实时布防
         m_strAlarmInfo.write();
-        int nativeLong = hcNetSDK.NET_DVR_SetupAlarmChan_V41(userId, m_strAlarmInfo);
+        int lAlarmHandle  = hcNetSDK.NET_DVR_SetupAlarmChan_V41(userId, m_strAlarmInfo);
         //如果布防失败返回-1
-        if (nativeLong<0){
+        if (lAlarmHandle < 0){
             log.error("布防失败！ code：{}",hcNetSDK.NET_DVR_GetLastError());
             hcNetSDK.NET_DVR_Logout(userId);  //注销
             hcNetSDK.NET_DVR_Cleanup(); //释放SDK资源
         }
-        log.info("布防成功：{}",nativeLong);
-        return nativeLong;
+        log.info("布防成功：{}",lAlarmHandle );
+        return lAlarmHandle ;
     }
 
     /**
@@ -256,15 +267,6 @@ public final class HkUtils {
      * @param callback 监听回调
      */
     public static void startListen(String ip, String port, HCNetSDK.FMSGCallBack_V31 callback){
-        hcNetSDK.NET_DVR_Init();
-        hcNetSDK.NET_DVR_SetConnectTime(2000,1);
-        hcNetSDK.NET_DVR_SetReconnect(10000,true);
-        /*HCNetSDK.NET_DVR_LOCAL_GENERAL_CFG struNET_DVR_LOCAL_GENERAL_CFG = new HCNetSDK.NET_DVR_LOCAL_GENERAL_CFG();
-        struNET_DVR_LOCAL_GENERAL_CFG.byAlarmJsonPictureSeparate = 1;   //设置JSON透传报警数据和图片分离
-        struNET_DVR_LOCAL_GENERAL_CFG.write();
-        Pointer pStrNET_DVR_LOCAL_GENERAL_CFG = struNET_DVR_LOCAL_GENERAL_CFG.getPointer();
-        hcNetSDK.NET_DVR_SetSDKLocalCfg(17, pStrNET_DVR_LOCAL_GENERAL_CFG);*/
-
         int lListenHandle = hcNetSDK.NET_DVR_StartListen_V30(ip, Short.parseShort(port), callback, null);
         if (lListenHandle == -1) {
             log.error("监听失败" + hcNetSDK.NET_DVR_GetLastError());
