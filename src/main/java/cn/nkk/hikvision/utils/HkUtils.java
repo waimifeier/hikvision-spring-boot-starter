@@ -212,7 +212,10 @@ public final class HkUtils {
      */
     public static int setupAlarmChan(int userId, HCNetSDK.FMSGCallBack_V31 callBack) {
 
-        hcNetSDK.NET_DVR_SetDVRMessageCallBack_V31(callBack, null);
+        boolean b = hcNetSDK.NET_DVR_SetDVRMessageCallBack_V31(callBack, null);
+        if(b){
+            log.info("设置回调成功");
+        }
 
         //布防参数
         HCNetSDK.NET_DVR_SETUPALARM_PARAM m_strAlarmInfo = new HCNetSDK.NET_DVR_SETUPALARM_PARAM();
