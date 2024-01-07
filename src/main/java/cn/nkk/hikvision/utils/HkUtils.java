@@ -629,5 +629,8 @@ public final class HkUtils {
             log.error("设备{},注册失败：{}",ip,hcNetSDK.NET_DVR_GetLastError());
             throw new RuntimeException("登陆失败");
         }
+          //获取当前SDK状态信息
+        HCNetSDK.NET_DVR_SDKSTATE sdkState = new HCNetSDK.NET_DVR_SDKSTATE();
+        boolean result = hcNetSDK.NET_DVR_GetSDKState(sdkState);
     }
 }
