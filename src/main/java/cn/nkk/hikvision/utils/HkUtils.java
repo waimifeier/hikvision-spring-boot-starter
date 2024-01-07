@@ -25,7 +25,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.servlet.AsyncContext;
 import java.io.File;
-import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
@@ -604,5 +603,31 @@ public final class HkUtils {
         FlvConverter converter = new FlvConverter(inputStream,outputStream,context,playHandler);
         log.info("线程池主动执行任务的线程的大致数,{}",taskExecutor.getActiveCount());
         taskExecutor.submit(converter);
+    }
+     public static void doLoginV40(String ip, short port, String userName, String password){
+        hcNetSDK.NET_DVR_Init();
+        hcNetSDK.NET_DVR_SetConnectTime(2000,1);
+        hcNetSDK.NET_DVR_SetReconnect(10000,true);
+
+        HCNetSDK.NET_DVR_DEVICEINFO_V40 deviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V40();
+        HCNetSDK.NET_DVR_USER_LOGIN_INFO loginInfo = new HCNetSDK.NET_DVR_USER_LOGIN_INFO();
+
+        // 注册设备-登录参数，包括设备地址、登录用户、密码等
+        loginInfo.sDeviceAddress = new byte[hcNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
+        System.arraycopy(ip.getBytes(), 0, loginInfo.sDeviceAddress, 0, ip.length());
+        loginInfo.sUserName = new byte[hcNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
+        System.arraycopy(userName.getBytes(), 0, loginInfo.sUserName, 0, userName.length());
+        loginInfo.sPassword = new byte[hcNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
+        System.arraycopy(password.getBytes(), 0, loginInfo.sPassword, 0, password.length());
+        loginInfo.wPort = port;
+        loginInfo.bUseAsynLogin = false; //是否异步登录：0- 否，1- 是
+        loginInfo.write();
+
+        // 登录
+        int lUserID = hcNetSDK.NET_DVR_Login_V40(loginInfo, deviceInfo);
+        if ( lUserID < 0 ){
+            log.error("设备{},注册失败：{}",ip,hcNetSDK.NET_DVR_GetLastError());
+            throw new RuntimeException("登陆失败");
+        }
     }
 }
