@@ -1,8 +1,12 @@
 package cn.nkk.hikvision.config;
 
+import cn.hutool.cache.CacheUtil;
+import cn.hutool.cache.impl.FIFOCache;
+import cn.nkk.hikvision.beans.CameraLogin;
 import cn.nkk.hikvision.properties.HiKProperties;
 import cn.nkk.hikvision.sdk.HCNetSDK;
 import cn.nkk.hikvision.sdk.PlayCtrl;
+import cn.nkk.hikvision.utils.HkUtils;
 import cn.nkk.hikvision.utils.OsSelectUtil;
 import cn.nkk.hikvision.utils.SpringContextHolder;
 import com.sun.jna.Native;
@@ -28,7 +32,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Import(SpringContextHolder.class)
 public class HikVisionAutoConfiguration {
 
-    private final static Logger log = LoggerFactory.getLogger(HikVisionAutoConfiguration.class);
+  private final static Logger log = LoggerFactory.getLogger(HikVisionAutoConfiguration.class);
+
+   private static final FIFOCache<String, CameraLogin> LOCAL_CACHE = CacheUtil.newFIFOCache(400);
 
    private HCNetSDK hCNetSDK = null;
 
@@ -118,8 +124,8 @@ public class HikVisionAutoConfiguration {
 
     @PreDestroy
     public void destroy(){
-        //SDK反初始化，释放资源，只需要退出时调用一次
-        if (null!=hCNetSDK) {
+        HkUtils.stopListen();
+        if (null != hCNetSDK) {
             log.info("释放hcNetSDK资源");
             hCNetSDK.NET_DVR_Cleanup();
         }

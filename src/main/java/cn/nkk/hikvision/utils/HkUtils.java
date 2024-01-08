@@ -1,6 +1,8 @@
 package cn.nkk.hikvision.utils;
 
 
+import cn.hutool.cache.CacheUtil;
+import cn.hutool.cache.impl.FIFOCache;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.NumberUtil;
@@ -27,10 +29,7 @@ import javax.servlet.AsyncContext;
 import java.io.File;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * <p>海康威视工具包</p>
@@ -41,6 +40,8 @@ public final class HkUtils {
 
     private final static Logger log = LoggerFactory.getLogger(HkUtils.class);
     private static final HCNetSDK hcNetSDK = SpringContextHolder.getBean(HCNetSDK.class);
+
+    private static final FIFOCache<String, CameraLogin> LOCAL_CACHE = CacheUtil.newFIFOCache(400);
 
 
     /**
@@ -74,8 +75,41 @@ public final class HkUtils {
     }
 
     /**
-     * 设备登陆
+     * 是否在线
      *
+     * @param serialNumber 设备序列号
+     * @return {@link Boolean}
+     */
+    public static Boolean hasOnline(String serialNumber){
+        try {
+            CameraLogin cameraLogin = LOCAL_CACHE.get("serialNumber");
+            HCNetSDK.NET_DVR_WORKSTATE_V30 workState = new HCNetSDK.NET_DVR_WORKSTATE_V30();
+            boolean result = hcNetSDK.NET_DVR_GetDVRWorkState_V30(cameraLogin.getUserId(), workState);
+            if (!result) {
+                log.error("获取设备{}状态失败",serialNumber);
+                return false;
+            }
+            log.info("设备状态：{}",workState.dwDeviceStatic);
+        }catch (Exception e){
+            log.error("获取设备{}状态失败",e.getMessage());
+        }
+        return false;
+    }
+
+
+    /**
+     * 获取登录配置文件
+     *
+     * @param serialNumber 序列号
+     * @return {@link CameraLogin}
+     */
+    public static CameraLogin loginProfile(String serialNumber){
+        return LOCAL_CACHE.get(serialNumber);
+    }
+
+    /**
+     *
+     * 设备登陆
      * @param ip       ip
      * @param port     端口
      * @param userName 用户名
@@ -98,12 +132,11 @@ public final class HkUtils {
 
         //如果注册失败返回-1，获取错误码
         if ( userId < 0 ){
-             log.error("设备{},注册失败：{}",ip,hcNetSDK.NET_DVR_GetLastError());
+             log.error("设备{}:{},注册失败：{}",ip,port,hcNetSDK.NET_DVR_GetLastError());
             throw new RuntimeException("登陆失败");
         }
 
         String serialNumber = new String(m_strDeviceInfo.sSerialNumber).trim();
-        log.info("设备{},注册成功,userId={}，设备编号：{}",ip,userId,serialNumber);
 
         int maxIpChannelNum = getChannelNum(m_strDeviceInfo);
         List<CameraLogin.CameraChannel> listChannel = getChannelNumber(userId, maxIpChannelNum, m_strDeviceInfo);
@@ -119,6 +152,8 @@ public final class HkUtils {
         HCNetSDK.FExceptionCallBack fExceptionCallBack = new FExceptionCallBack();
         hcNetSDK.NET_DVR_SetExceptionCallBack_V30(0,0,fExceptionCallBack, pUser);
 
+        log.info("设备{}:{},注册成功,userId={}，设备编号：{},设备数组通道总数:{},",ip,port,userId,serialNumber,maxIpChannelNum);
+        LOCAL_CACHE.put(serialNumber,cameraInfo);
         return cameraInfo;
     }
 
@@ -133,12 +168,10 @@ public final class HkUtils {
         if (deviceInfo.byHighDChanNum == 0)
         {
             maxIpChannelNum = deviceInfo.byIPChanNum & 0xff;
-            log.info("设备数组通道总数：{}",maxIpChannelNum);
         }
         else
         {
             maxIpChannelNum = (int)((deviceInfo.byHighDChanNum & 0xff) << 8);
-            log.info("设备数组通道总数：{}",maxIpChannelNum);
         }
         return maxIpChannelNum;
     }
@@ -152,11 +185,11 @@ public final class HkUtils {
     private static List<CameraLogin.CameraChannel> getChannelNumber(int lUserID, int maxIpChannelNum, HCNetSDK.NET_DVR_DEVICEINFO_V30 deviceInfo){
         List<CameraLogin.CameraChannel> cameraChannels = new ArrayList<>();
         //DVR工作状态
-        HCNetSDK.NET_DVR_WORKSTATE_V30 devwork = new HCNetSDK.NET_DVR_WORKSTATE_V30();
-        if (!hcNetSDK.NET_DVR_GetDVRWorkState_V30(lUserID, devwork)) {
+        HCNetSDK.NET_DVR_WORKSTATE_V30 devWork = new HCNetSDK.NET_DVR_WORKSTATE_V30();
+        if (!hcNetSDK.NET_DVR_GetDVRWorkState_V30(lUserID, devWork)) {
             log.info("返回设备状态失败"); // 返回Boolean值，判断是否获取设备能力
         }
-        devwork.write();
+        devWork.write();
 
         IntByReference ibrBytesReturned = new IntByReference(0);//获取IP接入配置参数
         HCNetSDK.NET_DVR_IPPARACFG_V40 m_strIpparaCfg = new HCNetSDK.NET_DVR_IPPARACFG_V40();
@@ -169,7 +202,7 @@ public final class HkUtils {
         if (!bRet) {
             //设备不支持,则表示没有IP通道
             for (int chanNum = 0; chanNum < deviceInfo.byChanNum; chanNum++) {
-                log.info("Camera{}",(chanNum + deviceInfo.byStartChan));
+                log.debug("Camera{}",(chanNum + deviceInfo.byStartChan));
             }
             return null;
         }
@@ -193,9 +226,9 @@ public final class HkUtils {
                 channel.setUserName(new String(dvrIpInfo.sUserName).trim());
                 channel.setPassword(new String(dvrIpInfo.sPassword).trim());
                 channel.setOnlineState((int) m_strIpparaCfg.struStreamMode[chanNum].uGetStream.struChanInfo.byEnable);
-                channel.setRecordState((int) devwork.struChanStatic[devworkChannels].byRecordStatic);
-                channel.setSignalState((int) devwork.struChanStatic[devworkChannels].bySignalStatic);
-                channel.setHardwareStatic((int) devwork.struChanStatic[devworkChannels].byHardwareStatic);
+                channel.setRecordState((int) devWork.struChanStatic[devworkChannels].byRecordStatic);
+                channel.setSignalState((int) devWork.struChanStatic[devworkChannels].bySignalStatic);
+                channel.setHardwareStatic((int) devWork.struChanStatic[devworkChannels].byHardwareStatic);
                 cameraChannels.add(channel);
             }
         }
@@ -280,7 +313,7 @@ public final class HkUtils {
     /**
      * 停止端口监听
      */
-    private static void stopListen(){
+    public static void stopListen(){
         hcNetSDK.NET_DVR_StopListen();
     }
 
@@ -604,7 +637,16 @@ public final class HkUtils {
         log.info("线程池主动执行任务的线程的大致数,{}",taskExecutor.getActiveCount());
         taskExecutor.submit(converter);
     }
-     public static void doLoginV40(String ip, short port, String userName, String password){
+
+    /**
+     * 登录v40
+     *
+     * @param ip       IP
+     * @param port     端口
+     * @param userName 用户名
+     * @param password 密码
+     */
+    public static void doLoginV40(String ip, String port, String userName, String password){
         hcNetSDK.NET_DVR_Init();
         hcNetSDK.NET_DVR_SetConnectTime(2000,1);
         hcNetSDK.NET_DVR_SetReconnect(10000,true);
@@ -619,7 +661,7 @@ public final class HkUtils {
         System.arraycopy(userName.getBytes(), 0, loginInfo.sUserName, 0, userName.length());
         loginInfo.sPassword = new byte[hcNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
         System.arraycopy(password.getBytes(), 0, loginInfo.sPassword, 0, password.length());
-        loginInfo.wPort = port;
+        loginInfo.wPort = Short.parseShort(port);
         loginInfo.bUseAsynLogin = false; //是否异步登录：0- 否，1- 是
         loginInfo.write();
 
@@ -632,5 +674,7 @@ public final class HkUtils {
           //获取当前SDK状态信息
         HCNetSDK.NET_DVR_SDKSTATE sdkState = new HCNetSDK.NET_DVR_SDKSTATE();
         boolean result = hcNetSDK.NET_DVR_GetSDKState(sdkState);
+
+        log.info("登陆成功：{}, 设备状态：{}",lUserID,result);
     }
 }
