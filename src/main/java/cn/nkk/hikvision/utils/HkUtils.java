@@ -306,6 +306,7 @@ public final class HkUtils {
         hcNetSDK.NET_DVR_Logout(cameraLogin.getUserId());
         hcNetSDK.NET_DVR_Cleanup();
         log.info("设备：{}注销完成",cameraLogin.getUserId());
+        LOCAL_CACHE.remove(serialNumber);
     }
 
 
