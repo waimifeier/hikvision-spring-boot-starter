@@ -293,6 +293,21 @@ public final class HkUtils {
         log.info("设备：{}注销完成",userId);
     }
 
+    /**
+     * 做注销
+     *
+     * @param serialNumber 序列号
+     */
+    public static void doLogout(String serialNumber){
+        CameraLogin cameraLogin = LOCAL_CACHE.get(serialNumber);
+        if(Objects.isNull(cameraLogin)){
+            return;
+        }
+        hcNetSDK.NET_DVR_Logout(cameraLogin.getUserId());
+        hcNetSDK.NET_DVR_Cleanup();
+        log.info("设备：{}注销完成",cameraLogin.getUserId());
+    }
+
 
     /**
      * 侦听端口
