@@ -9,23 +9,52 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class HiKProperties {
 
     /**
-     * 海康sdk位置
-     */
-    private String sdk_path;
-
-
-    /**
      * 拉流配置
      */
     public PullStream stream;
-
+    /**
+     * 海康sdk位置
+     */
+    private String sdk_path;
     /**
      * 线程池配置
      */
     private HikPool pool;
 
+    public String getSdk_path() {
+        return sdk_path;
+    }
 
-    public static class HikPool{
+    public void setSdk_path(String sdk_path) {
+        this.sdk_path = sdk_path;
+    }
+
+    public PullStream getStream() {
+        return stream;
+    }
+
+    public void setStream(PullStream stream) {
+        this.stream = stream;
+    }
+
+    public HikPool getPool() {
+        return pool;
+    }
+
+    public void setPool(HikPool pool) {
+        this.pool = pool;
+    }
+
+    @Override
+    public String toString() {
+        return "HiKProperties{" +
+                "sdk_path='" + sdk_path + '\'' +
+                ", stream=" + stream +
+                ", pool=" + pool +
+                '}';
+    }
+
+    public static class HikPool {
         /**
          * 核心线程数
          */
@@ -90,8 +119,7 @@ public class HiKProperties {
         }
     }
 
-
-    public static class PullStream{
+    public static class PullStream {
 
         /**
          * m3u8磁盘路径
@@ -112,39 +140,5 @@ public class HiKProperties {
                     "m3u8_path='" + m3u8_path + '\'' +
                     '}';
         }
-    }
-
-
-    public String getSdk_path() {
-        return sdk_path;
-    }
-
-    public void setSdk_path(String sdk_path) {
-        this.sdk_path = sdk_path;
-    }
-
-    public PullStream getStream() {
-        return stream;
-    }
-
-    public void setStream(PullStream stream) {
-        this.stream = stream;
-    }
-
-    public HikPool getPool() {
-        return pool;
-    }
-
-    public void setPool(HikPool pool) {
-        this.pool = pool;
-    }
-
-    @Override
-    public String toString() {
-        return "HiKProperties{" +
-                "sdk_path='" + sdk_path + '\'' +
-                ", stream=" + stream +
-                ", pool=" + pool +
-                '}';
     }
 }

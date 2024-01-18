@@ -25,13 +25,14 @@ import java.util.concurrent.TimeUnit;
  * @author dlj
  * @date 2023/03/29
  */
+
 /**
  * flv转换器
  *
  * @author dlj
  * @date 2023/03/29
  */
-public class FlvConverter extends Thread implements Converter{
+public class FlvConverter extends Thread implements Converter {
 
     private static final Logger log = LoggerFactory.getLogger(FlvConverter.class);
     private byte[] headers;
@@ -69,14 +70,14 @@ public class FlvConverter extends Thread implements Converter{
         try {
             avutil.av_log_set_level(avutil.AV_LOG_ERROR);
             log.info("进入grabber------------------------");
-            grabber = Objects.nonNull(inputStream) ? new FFmpegFrameGrabber(inputStream,0) : new FFmpegFrameGrabber(rtspUrl);
+            grabber = Objects.nonNull(inputStream) ? new FFmpegFrameGrabber(inputStream, 0) : new FFmpegFrameGrabber(rtspUrl);
             if (StrUtil.isNotEmpty(rtspUrl) && rtspUrl.startsWith("rtsp")) {
                 grabber.setOption("rtsp_transport", "tcp");
                 //首选TCP进行RTP传输
                 grabber.setOption("rtsp_flags", "prefer_tcp");
                 log.info("rtsp链接------------------------");
             }
-            if(Objects.nonNull(inputStream)){
+            if (Objects.nonNull(inputStream)) {
                 //检测管道流中是否存在数据，如果2s后依然没有写入1024的数据，则认为管道流中无数据，避免grabber.start();发生阻塞
                 long stime = new Date().getTime();
                 while (true) {
@@ -93,7 +94,7 @@ public class FlvConverter extends Thread implements Converter{
             grabber.setOption("buffer_size", "1024000");
             grabber.startUnsafe();
             int videoCodec = grabber.getVideoCodec();
-            log.info("启动grabber,编码{}",videoCodec);
+            log.info("启动grabber,编码{}", videoCodec);
             grabber.setImageWidth(640);
             grabber.setImageHeight(480);
 
@@ -141,20 +142,20 @@ public class FlvConverter extends Thread implements Converter{
                 TimeUnit.MILLISECONDS.sleep(5);
             }
         } catch (Exception e) {
-            log.error("异步出错,{}",e.getMessage());
+            log.error("异步出错,{}", e.getMessage());
         } finally {
             try {
-                if(this.outputStream!=null) this.outputStream.close();
-                if(this.inputStream != null) this.inputStream.close();
-                if(this.playHandler!= null) HkUtils.stopBackPlay(this.playHandler);
-                if(grabber!= null) grabber.close();
+                if (this.outputStream != null) this.outputStream.close();
+                if (this.inputStream != null) this.inputStream.close();
+                if (this.playHandler != null) HkUtils.stopBackPlay(this.playHandler);
+                if (grabber != null) grabber.close();
                 if (recorder != null) recorder.close();
                 if (stream != null) stream.close();
                 System.gc();
                 context.getResponse().flushBuffer();
                 context.complete();
             } catch (Exception e) {
-                log.error("资源回收,{}",e.getMessage());
+                log.error("资源回收,{}", e.getMessage());
             }
         }
 
@@ -173,7 +174,6 @@ public class FlvConverter extends Thread implements Converter{
             context.complete();
         }
     }
-
 
 
     @Override

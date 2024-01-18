@@ -32,45 +32,19 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Import(SpringContextHolder.class)
 public class HikVisionAutoConfiguration {
 
-  private final static Logger log = LoggerFactory.getLogger(HikVisionAutoConfiguration.class);
+    private final static Logger log = LoggerFactory.getLogger(HikVisionAutoConfiguration.class);
 
-   private static final FIFOCache<String, CameraLogin> LOCAL_CACHE = CacheUtil.newFIFOCache(400);
+    private static final FIFOCache<String, CameraLogin> LOCAL_CACHE = CacheUtil.newFIFOCache(400);
 
-   private HCNetSDK hCNetSDK = null;
+    private HCNetSDK hCNetSDK = null;
 
-   private PlayCtrl playControl = null;
+    private final PlayCtrl playControl = null;
 
-   public HikVisionAutoConfiguration(HiKProperties properties){
-       if(properties.getSdk_path()==null){
-           throw new IllegalArgumentException("请指定sdk类库（注意区分系统版本）");
-       }
-
-   }
-
-    @Bean
-    public HCNetSDK initSdk(HiKProperties properties){
-        synchronized (HCNetSDK.class) {
-            String strDllPath = "";
-            try {
-                //win系统加载库路径
-                if (OsSelectUtil.isWindows()) {
-                    strDllPath = properties.getSdk_path().startsWith("classpath") ?
-                            ResourceUtils.getFile(properties.getSdk_path()+"/HCNetSDK.dll").getPath() : properties.getSdk_path()+"/HCNetSDK.dll";
-                }
-                //Linux系统加载库路径
-                else if (OsSelectUtil.isLinux()){
-                    strDllPath = properties.getSdk_path().startsWith("classpath") ?
-                            ResourceUtils.getFile(properties.getSdk_path()+"/libhcnetsdk.so").getPath() : properties.getSdk_path()+"/libhcnetsdk.so";
-                }
-                hCNetSDK = (HCNetSDK) Native.loadLibrary(strDllPath, HCNetSDK.class);
-            } catch (Exception ex) {
-                log.error("加载HikSdk失败");
-                ex.printStackTrace();
-                return null;
-            }
+    public HikVisionAutoConfiguration(HiKProperties properties) {
+        if (properties.getSdk_path() == null) {
+            throw new IllegalArgumentException("请指定sdk类库（注意区分系统版本）");
         }
-        log.info("加载hksdk成功");
-        return hCNetSDK;
+
     }
 
     @Bean
@@ -83,12 +57,12 @@ public class HikVisionAutoConfiguration {
                 //win系统加载库路径
                 if (OsSelectUtil.isWindows())
                     strPlayPath = properties.getSdk_path().startsWith("classpath") ?
-                            ResourceUtils.getFile(properties.getSdk_path()+"/PlayCtrl.dll").getPath() : properties.getSdk_path()+"/PlayCtrl.dll";
-                //Linux系统加载库路径
+                            ResourceUtils.getFile(properties.getSdk_path() + "/PlayCtrl.dll").getPath() : properties.getSdk_path() + "/PlayCtrl.dll";
+                    //Linux系统加载库路径
                 else if (OsSelectUtil.isLinux())
                     strPlayPath = properties.getSdk_path().startsWith("classpath") ?
-                            ResourceUtils.getFile(properties.getSdk_path()+"/libPlayCtrl.so").getPath() : properties.getSdk_path()+"/libPlayCtrl.so";
-                playControl = (PlayCtrl) Native.loadLibrary(strPlayPath,PlayCtrl.class);
+                            ResourceUtils.getFile(properties.getSdk_path() + "/libPlayCtrl.so").getPath() : properties.getSdk_path() + "/libPlayCtrl.so";
+                playControl = (PlayCtrl) Native.loadLibrary(strPlayPath, PlayCtrl.class);
             } catch (Exception ex) {
                 log.error("加载playControl失败}");
                 ex.printStackTrace();
@@ -97,6 +71,32 @@ public class HikVisionAutoConfiguration {
         }
         log.info("加载PlayCtrl成功");
         return playControl;
+    }
+
+    @Bean
+    public HCNetSDK initSdk(HiKProperties properties) {
+        synchronized (HCNetSDK.class) {
+            String strDllPath = "";
+            try {
+                //win系统加载库路径
+                if (OsSelectUtil.isWindows()) {
+                    strDllPath = properties.getSdk_path().startsWith("classpath") ?
+                            ResourceUtils.getFile(properties.getSdk_path() + "/HCNetSDK.dll").getPath() : properties.getSdk_path() + "/HCNetSDK.dll";
+                }
+                //Linux系统加载库路径
+                else if (OsSelectUtil.isLinux()) {
+                    strDllPath = properties.getSdk_path().startsWith("classpath") ?
+                            ResourceUtils.getFile(properties.getSdk_path() + "/libhcnetsdk.so").getPath() : properties.getSdk_path() + "/libhcnetsdk.so";
+                }
+                hCNetSDK = (HCNetSDK) Native.loadLibrary(strDllPath, HCNetSDK.class);
+            } catch (Exception ex) {
+                log.error("加载HikSdk失败");
+                ex.printStackTrace();
+                return null;
+            }
+        }
+        log.info("加载hksdk成功");
+        return hCNetSDK;
     }
 
     @Bean("converterPoolExecutor")
@@ -123,7 +123,7 @@ public class HikVisionAutoConfiguration {
     }
 
     @PreDestroy
-    public void destroy(){
+    public void destroy() {
         HkUtils.stopListen();
         if (null != hCNetSDK) {
             log.info("释放hcNetSDK资源");

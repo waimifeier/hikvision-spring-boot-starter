@@ -25,13 +25,13 @@ import static org.bytedeco.ffmpeg.global.avcodec.av_packet_unref;
  * @author dlj
  * @date 2023/03/29
  */
-public class M3u8Converter extends Thread implements Converter{
+public class M3u8Converter extends Thread implements Converter {
 
     private final static Logger log = LoggerFactory.getLogger(M3u8Converter.class);
 
     private final String rtspUrl;
 
-    public M3u8Converter(String rtspUrl){
+    public M3u8Converter(String rtspUrl) {
         this.rtspUrl = rtspUrl;
     }
 
@@ -39,13 +39,13 @@ public class M3u8Converter extends Thread implements Converter{
     @Override
     public void run() {
         HiKProperties hiKProperties = SpringContextHolder.getBean(HiKProperties.class);
-        if(StrUtil.isEmpty(hiKProperties.getStream().getM3u8_path())){
+        if (StrUtil.isEmpty(hiKProperties.getStream().getM3u8_path())) {
             throw new IllegalArgumentException("请配置m3u8视频流存储路径");
         }
 
         String md5 = Md5Utils.encrypt16(rtspUrl);
         File file = new File(hiKProperties.getStream().getM3u8_path(), md5);
-        if(!file.exists()){
+        if (!file.exists()) {
             FileUtil.mkdir(file);
         }
         // 存放m3u8切片视频的目录
@@ -120,7 +120,7 @@ public class M3u8Converter extends Thread implements Converter{
                     continue;
                 }
                 if (pkt.dts() == avutil.AV_NOPTS_VALUE && pkt.pts() == avutil.AV_NOPTS_VALUE || pkt.pts() < dts) {
-                    log.debug("异常pkt   当前pts: " + pkt.pts() + "  dts: " + pkt.dts() + "  上一包的pts： " + pts + " dts: "+ dts);
+                    log.debug("异常pkt   当前pts: " + pkt.pts() + "  dts: " + pkt.dts() + "  上一包的pts： " + pts + " dts: " + dts);
                     av_packet_unref(pkt);
                     continue;
                 }
@@ -133,8 +133,7 @@ public class M3u8Converter extends Thread implements Converter{
                 //取出过滤器合并后的图像
                 //   Frame filterFrame=filter.pullImage();
                 long spull_end = System.currentTimeMillis();
-                if ((spull_end - spull_start) > 500)
-                    log.info("pull stream take up time : {}", spull_end - spull_start);
+                if ((spull_end - spull_start) > 500) log.info("pull stream take up time : {}", spull_end - spull_start);
                 recorder.recordPacket(pkt);
                 timebase = grabber.getFormatContext().streams(pkt.stream_index()).time_base().den();
                 pts += (timebase / (int) framerate);
@@ -147,12 +146,12 @@ public class M3u8Converter extends Thread implements Converter{
             //可以在这里写个错误图片流返回，这样播放器就能看到问题了
         } finally {
             try {
-                if(Objects.nonNull(grabber)) grabber.close();
-                if(Objects.nonNull(recorder)) recorder.close();
+                if (Objects.nonNull(grabber)) grabber.close();
+                if (Objects.nonNull(recorder)) recorder.close();
                 FileUtil.del(m3u8Path);
                 System.gc();
             } catch (Exception e) {
-                log.error("资源回收：{}",e.getMessage());
+                log.error("资源回收：{}", e.getMessage());
             }
         }
     }

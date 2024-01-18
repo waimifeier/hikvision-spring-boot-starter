@@ -15,14 +15,13 @@ public class FExceptionCallBack implements HCNetSDK.FExceptionCallBack {
 
     @Override
     public void invoke(int dwType, int lUserID, int lHandle, Pointer pUser) {
-        log.info("设备异常,dwType：{},userId:{},handler:{}",dwType,lUserID,lHandle);
-        switch(dwType)
-        {
+        log.info("设备异常,dwType：{},userId:{},handler:{}", dwType, lUserID, lHandle);
+        switch (dwType) {
             case EXCEPTION_EXCHANGE: //用户交互时异常
-                log.error("用户交互时异常:{}",lHandle);
+                log.error("用户交互时异常:{}", lHandle);
                 break;
             case 0x8017:
-                log.error("用户交互恢复:{}",lHandle);
+                log.error("用户交互恢复:{}", lHandle);
                 break;
             default:
                 System.out.println("异常");

@@ -3,12 +3,12 @@ package cn.nkk.hikvision.utils;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
- 
+
 /**
  * Md5工具包
  */
 public final class Md5Utils {
- 
+
     /**
      * Md5加密，返回32的字符串
      *
@@ -23,8 +23,8 @@ public final class Md5Utils {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(str.getBytes("utf-8"));
-            byte         b[] = md.digest();
-            int          i;
+            byte b[] = md.digest();
+            int i;
             StringBuffer buf = new StringBuffer("");
             for (int offset = 0; offset < b.length; offset++) {
                 i = b[offset];
@@ -44,7 +44,7 @@ public final class Md5Utils {
         }
         return result;
     }
- 
+
     /**
      * Md5加密，返回16的字符串(16位的密文就是32位中间的16位)
      *
@@ -57,5 +57,5 @@ public final class Md5Utils {
         }
         return encrypt32(str).substring(8, 24);
     }
- 
+
 }
