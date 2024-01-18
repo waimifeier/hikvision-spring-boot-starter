@@ -93,7 +93,7 @@ public class FlvConverter extends Thread implements Converter{
             grabber.setOption("buffer_size", "1024000");
             grabber.startUnsafe();
             int videoCodec = grabber.getVideoCodec();
-            log.info("启动grabber,编码{}------------------------",videoCodec);
+            log.info("启动grabber,编码{}",videoCodec);
             grabber.setImageWidth(640);
             grabber.setImageHeight(480);
 
@@ -141,8 +141,7 @@ public class FlvConverter extends Thread implements Converter{
                 TimeUnit.MILLISECONDS.sleep(5);
             }
         } catch (Exception e) {
-            log.info("异步出错------------------------"+e.getMessage());
-            e.printStackTrace();
+            log.error("异步出错,{}",e.getMessage());
         } finally {
             try {
                 if(this.outputStream!=null) this.outputStream.close();
@@ -151,11 +150,11 @@ public class FlvConverter extends Thread implements Converter{
                 if(grabber!= null) grabber.close();
                 if (recorder != null) recorder.close();
                 if (stream != null) stream.close();
-                log.info("资源回收完成----------------------");
+                System.gc();
                 context.getResponse().flushBuffer();
                 context.complete();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("资源回收,{}",e.getMessage());
             }
         }
 

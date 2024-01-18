@@ -150,8 +150,9 @@ public class M3u8Converter extends Thread implements Converter{
                 if(Objects.nonNull(grabber)) grabber.close();
                 if(Objects.nonNull(recorder)) recorder.close();
                 FileUtil.del(m3u8Path);
+                System.gc();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("资源回收：{}",e.getMessage());
             }
         }
     }

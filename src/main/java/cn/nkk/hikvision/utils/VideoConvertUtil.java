@@ -61,6 +61,7 @@ public class VideoConvertUtil {
             if (recorder != null) {
                 try {
                     recorder.close();
+                    System.gc();
                 } catch (Exception e) {
                     log.error("转码recorder异常：{}", e.getMessage());
                 }
@@ -68,7 +69,7 @@ public class VideoConvertUtil {
 
             try {
                 grabber.close();
-
+                System.gc();
             } catch (FrameGrabber.Exception e) {
                 log.error("转码close异常异常：{}", e.getMessage());
             }
