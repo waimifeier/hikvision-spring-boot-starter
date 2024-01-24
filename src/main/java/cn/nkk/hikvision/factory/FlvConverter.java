@@ -69,13 +69,13 @@ public class FlvConverter extends Thread implements Converter {
         ByteArrayOutputStream stream = null;
         try {
             avutil.av_log_set_level(avutil.AV_LOG_ERROR);
-            log.info("进入grabber------------------------");
+            log.info("进入grabber抓流");
             grabber = Objects.nonNull(inputStream) ? new FFmpegFrameGrabber(inputStream, 0) : new FFmpegFrameGrabber(rtspUrl);
             if (StrUtil.isNotEmpty(rtspUrl) && rtspUrl.startsWith("rtsp")) {
                 grabber.setOption("rtsp_transport", "tcp");
                 //首选TCP进行RTP传输
                 grabber.setOption("rtsp_flags", "prefer_tcp");
-                log.info("rtsp链接------------------------");
+                log.info("rtsp链接");
             }
             if (Objects.nonNull(inputStream)) {
                 //检测管道流中是否存在数据，如果2s后依然没有写入1024的数据，则认为管道流中无数据，避免grabber.start();发生阻塞

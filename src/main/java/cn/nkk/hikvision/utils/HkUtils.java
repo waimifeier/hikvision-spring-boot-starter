@@ -515,12 +515,7 @@ public final class HkUtils {
      */
     public static VideoPreview startBackPlay(int userId, int channelNum, String beginTime, String endTime) {
 
-        int playHandle = hcNetSDK.NET_DVR_PlayBackByTime(
-                userId,
-                channelNum,
-                CommonUtil.getNvrTime(DateUtil.parseDateTime(beginTime)),
-                CommonUtil.getNvrTime(DateUtil.parseDateTime(endTime))
-                , null);
+        int playHandle = hcNetSDK.NET_DVR_PlayBackByTime(userId, channelNum, CommonUtil.getNvrTime(DateUtil.parseDateTime(beginTime)), CommonUtil.getNvrTime(DateUtil.parseDateTime(endTime)), null);
 
         if (playHandle < 0) {
             int v30ErrorCode = hcNetSDK.NET_DVR_GetLastError();
@@ -608,8 +603,7 @@ public final class HkUtils {
      * @return {@link String} 返回推流结果
      */
     public static String toRtspUrl(String ip, String port, String userName, String password, int channelNum, String beginTime, String endTime) {
-        return StrUtil.format("rtsp://{}:{}@{}:{}/Streaming/tracks/{}0{}?starttime={}&endtime={}", userName, password, ip, port, channelNum, 1,
-                DateUtil.format(DateUtil.parseDateTime(beginTime), "yyyyMMdd't'HHmmss'z'"), DateUtil.format(DateUtil.parseDateTime(endTime), "yyyyMMdd't'HHmmss'z'"));
+        return StrUtil.format("rtsp://{}:{}@{}:{}/Streaming/tracks/{}0{}?starttime={}&endtime={}", userName, password, ip, port, channelNum, 1, DateUtil.format(DateUtil.parseDateTime(beginTime), "yyyyMMdd't'HHmmss'z'"), DateUtil.format(DateUtil.parseDateTime(endTime), "yyyyMMdd't'HHmmss'z'"));
     }
 
 

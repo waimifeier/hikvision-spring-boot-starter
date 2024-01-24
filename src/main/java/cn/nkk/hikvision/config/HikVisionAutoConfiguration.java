@@ -1,8 +1,7 @@
 package cn.nkk.hikvision.config;
 
-import cn.hutool.cache.CacheUtil;
-import cn.hutool.cache.impl.FIFOCache;
-import cn.nkk.hikvision.beans.CameraLogin;
+import cn.nkk.hikvision.callBack.BackDataCallBack;
+import cn.nkk.hikvision.callBack.RealDataCallBack;
 import cn.nkk.hikvision.properties.HiKProperties;
 import cn.nkk.hikvision.sdk.HCNetSDK;
 import cn.nkk.hikvision.sdk.PlayCtrl;
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.ResourceUtils;
@@ -27,18 +25,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * 海康威视自动配置类
  */
-@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties({HiKProperties.class})
-@Import(SpringContextHolder.class)
+@Import({SpringContextHolder.class, BackDataCallBack.class, RealDataCallBack.class})
 public class HikVisionAutoConfiguration {
 
     private final static Logger log = LoggerFactory.getLogger(HikVisionAutoConfiguration.class);
-
-    private static final FIFOCache<String, CameraLogin> LOCAL_CACHE = CacheUtil.newFIFOCache(400);
-
     private HCNetSDK hCNetSDK = null;
-
-    private final PlayCtrl playControl = null;
 
     public HikVisionAutoConfiguration(HiKProperties properties) {
         if (properties.getSdk_path() == null) {
@@ -49,7 +41,7 @@ public class HikVisionAutoConfiguration {
 
     @Bean
     @ConditionalOnWebApplication
-    private static PlayCtrl initPlay(HiKProperties properties) {
+    public PlayCtrl initPlay(HiKProperties properties) {
         PlayCtrl playControl = null;
         synchronized (PlayCtrl.class) {
             String strPlayPath = "";

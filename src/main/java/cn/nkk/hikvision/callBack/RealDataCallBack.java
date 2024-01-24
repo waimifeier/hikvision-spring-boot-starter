@@ -5,7 +5,6 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.ByteByReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.PipedOutputStream;
@@ -18,7 +17,6 @@ import java.util.Map;
  * 实时数据回调
  */
 
-@Component
 public class RealDataCallBack implements HCNetSDK.FRealDataCallBack_V30 {
 
     private final static Logger log = LoggerFactory.getLogger(RealDataCallBack.class);
