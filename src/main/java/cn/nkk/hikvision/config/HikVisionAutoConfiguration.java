@@ -11,6 +11,7 @@ import cn.nkk.hikvision.utils.SpringContextHolder;
 import com.sun.jna.Native;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -41,6 +42,7 @@ public class HikVisionAutoConfiguration {
 
     @Bean
     @ConditionalOnWebApplication
+    @ConditionalOnProperty(prefix = "hik.enablePlay",havingValue = "true")
     public PlayCtrl initPlay(HiKProperties properties) {
         PlayCtrl playControl = null;
         synchronized (PlayCtrl.class) {

@@ -16,10 +16,17 @@ public class HiKProperties {
      * 海康sdk位置
      */
     private String sdk_path;
+
     /**
      * 线程池配置
      */
     private HikPool pool;
+
+
+    /**
+     * 启用播放
+     */
+    private boolean enablePlay = false;
 
     public String getSdk_path() {
         return sdk_path;
@@ -43,6 +50,14 @@ public class HiKProperties {
 
     public void setPool(HikPool pool) {
         this.pool = pool;
+    }
+
+    public boolean isEnablePlay() {
+        return enablePlay;
+    }
+
+    public void setEnablePlay(boolean enablePlay) {
+        this.enablePlay = enablePlay;
     }
 
     @Override
