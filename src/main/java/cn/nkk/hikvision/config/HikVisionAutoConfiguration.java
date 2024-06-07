@@ -42,7 +42,7 @@ public class HikVisionAutoConfiguration {
 
     @Bean
     @ConditionalOnWebApplication
-    @ConditionalOnProperty(prefix = "hik.enablePlay",havingValue = "true")
+    @ConditionalOnProperty(prefix = "hik",name="enablePlay",havingValue = "true")
     public PlayCtrl initPlay(HiKProperties properties) {
         PlayCtrl playControl = null;
         synchronized (PlayCtrl.class) {
