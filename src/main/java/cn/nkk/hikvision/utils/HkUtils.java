@@ -13,8 +13,6 @@ import cn.nkk.hikvision.beans.VideoPreview;
 import cn.nkk.hikvision.callBack.BackDataCallBack;
 import cn.nkk.hikvision.callBack.RealDataCallBack;
 import cn.nkk.hikvision.events.FExceptionCallBack;
-import cn.nkk.hikvision.factory.FlvConverter;
-import cn.nkk.hikvision.factory.M3u8Converter;
 import cn.nkk.hikvision.properties.HiKProperties;
 import cn.nkk.hikvision.sdk.HCNetSDK;
 import com.sun.jna.Pointer;
@@ -22,12 +20,8 @@ import com.sun.jna.ptr.IntByReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.system.ApplicationHome;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import javax.servlet.AsyncContext;
 import java.io.File;
-import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.*;
 
@@ -379,18 +373,6 @@ public final class HkUtils {
 
         // 释放查询资源
         hcNetSDK.NET_DVR_StopGetFile(downloadRes);
-
-        // 转换成mp4格式，否者在linux下无法播放
-        String convertPath = disk.getPath() + File.separator + UUID.randomUUID().toString() + ".mp4";
-        try {
-            boolean complete = VideoConvertUtil.convert(videoPath, convertPath);
-            if (complete) {
-                FileUtil.del(videoPath);
-                return convertPath;
-            }
-        } catch (Exception ignore) {
-        }
-
         return videoPath;
     }
 
@@ -604,45 +586,6 @@ public final class HkUtils {
      */
     public static String toRtspUrl(String ip, String port, String userName, String password, int channelNum, String beginTime, String endTime) {
         return StrUtil.format("rtsp://{}:{}@{}:{}/Streaming/tracks/{}0{}?starttime={}&endtime={}", userName, password, ip, port, channelNum, 1, DateUtil.format(DateUtil.parseDateTime(beginTime), "yyyyMMdd't'HHmmss'z'"), DateUtil.format(DateUtil.parseDateTime(endTime), "yyyyMMdd't'HHmmss'z'"));
-    }
-
-
-    /**
-     * m3u8播放
-     *
-     * @param rtspUrl rtsp url
-     * @return {@link TaskExecutor}
-     */
-    public static void rtspToM3u8(String rtspUrl) {
-        ThreadPoolTaskExecutor taskExecutor = SpringContextHolder.getBean("converterPoolExecutor");
-        M3u8Converter converter = new M3u8Converter(rtspUrl);
-        taskExecutor.submit(converter);
-    }
-
-    /**
-     * rtsp flv格式
-     *
-     * @param rtspUrl rtsp url
-     * @return {@link Thread}
-     */
-    public static void rtspToFlv(String rtspUrl, AsyncContext context) {
-        ThreadPoolTaskExecutor taskExecutor = SpringContextHolder.getBean("converterPoolExecutor");
-        FlvConverter converter = new FlvConverter(rtspUrl, context);
-        taskExecutor.submit(converter);
-    }
-
-    /**
-     * 视频码流转flv
-     *
-     * @param outputStream 输出流
-     * @param context      上下文
-     * @param playHandler  播放句柄
-     */
-    public static void streamToFlv(PipedInputStream inputStream, PipedOutputStream outputStream, AsyncContext context, Integer playHandler) {
-        ThreadPoolTaskExecutor taskExecutor = SpringContextHolder.getBean("converterPoolExecutor");
-        FlvConverter converter = new FlvConverter(inputStream, outputStream, context, playHandler);
-        log.info("线程池主动执行任务的线程的大致数,{}", taskExecutor.getActiveCount());
-        taskExecutor.submit(converter);
     }
 
     /**

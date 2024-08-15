@@ -88,12 +88,12 @@
         </dependency>
 
         <!--抓流-->
-        <dependency>
+       <!-- <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>javacv-platform</artifactId>
             <version>${javacv-platform.version}</version>
             <scope>compile</scope>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>cn.hutool</groupId>
