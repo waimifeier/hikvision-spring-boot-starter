@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.system.ApplicationHome;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.PipedOutputStream;
 import java.util.*;
 
@@ -370,10 +371,23 @@ public final class HkUtils {
                 break;
             }
         }
-
-        // 释放查询资源
-        hcNetSDK.NET_DVR_StopGetFile(downloadRes);
-        return videoPath;
+        // 开始转码
+        String distFile = disk.getPath() + File.separator + UUID.randomUUID().toString() + ".mp4";
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("ffmpeg", "-i", videoPath, distFile);
+            Process process = processBuilder.start();
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                log.info("文件：{},转码完成", videoPath);
+            } else {
+                log.error("文件：{},转码失败", videoPath);
+            }
+        }finally {
+            // 释放查询资源
+            hcNetSDK.NET_DVR_StopGetFile(downloadRes);
+            FileUtil.del(videoPath);
+        }
+        return distFile;
     }
 
     /**
